@@ -1,0 +1,10 @@
+{
+    "name": "stacc/recommender",
+    "description": "STACC Recommender System",
+    "type": "magento2-module",
+    "version": "2.0.0",
+    "autoload": {
+        "psr-4": { "Stacc\\Recommender\\": "" },
+        "files": [ "registration.php" ]
+    }
+}

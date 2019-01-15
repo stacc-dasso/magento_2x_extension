@@ -1,0 +1,27 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="Stacc\Recommender\Network\HttpRequest" type="Stacc\Recommender\Network\CurlHttpRequest"/>
+
+    <!-- Logging -->
+    <preference for="Stacc\Recommender\Logger\Logger" type="Stacc\Recommender\Model\Config\FileLogger\Virtual"/>
+
+    <virtualType name="Stacc\Recommender\Model\Config\FileLogger\Virtual" type="Stacc\Recommender\Logger\Logger">
+        <arguments>
+            <argument name="jsonFormatter" xsi:type="object">Monolog\Formatter\JsonFormatter</argument>
+            <argument name="componentRegistrar" xsi:type="object">Magento\Framework\Component\ComponentRegistrarInterface</argument>
+            <argument name="name" xsi:type="string">FileLogger</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="file" xsi:type="object">Stacc\Recommender\Model\Config\FileHandler\Virtual</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Stacc\Recommender\Model\Config\FileHandler\Virtual" type="Monolog\Handler\StreamHandler">
+        <arguments>
+            <argument name="stream" xsi:type="string">var/log/stacc_unsent.log</argument>
+            <argument name="level" xsi:type="const">Monolog\Logger::INFO</argument>
+        </arguments>
+    </virtualType>
+</config>
+

@@ -1,0 +1,23 @@
+<div id="<?php echo $this->getElementId() ?>"
+     class="stacc_recommendations_container"
+     data-stacc-ver="<?php echo $this->getExtensionVersion(); ?>"
+     data-stacc-container-time="<?php echo microtime(true) ?>"></div>
+<!-- Container for recommendations -->
+<?php
+$script = sprintf("<script>
+            var d = new Date();
+            time = d.getTime();
+            window.addEventListener('load', function () {
+                staccRecommender('%s'+'&tjs='+time, '%s');
+            })
+        </script>",
+    $this->getUrl(
+        'recommender/recommendation/get') . "?" . http_build_query(array(
+        'productId' => $this->getProductId() ?: "",
+        'blockId' => $this->getElementId(),
+        'template' => $this->getRecommendationTemplate()
+    )),
+    $this->getElementId()
+);
+echo $script;
+?>

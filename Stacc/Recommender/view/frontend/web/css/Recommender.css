@@ -1,0 +1,203 @@
+.stacc_recommendations_container *{
+    box-sizing: border-box;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 {
+    width: 100%;
+    box-sizing: border-box;
+    color: #2B2A29;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 h2 {
+    text-transform: uppercase;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 ul {
+    width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 ul li {
+    width: 19.8%;
+    padding-right: 1px;
+    text-align: center;
+}
+
+@media screen and (max-width: 798px) {
+    .stacc_recommendations_container .stacc_recommender_recommendations_1 ul li {
+        width: 24.8%;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 636px) {
+    .stacc_recommendations_container .stacc_recommender_recommendations_1 ul li {
+        width: 32.8%;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 485px) {
+    .stacc_recommendations_container .stacc_recommender_recommendations_1 ul li {
+        width: 49.8%;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 345px) {
+    .stacc_recommendations_container .stacc_recommender_recommendations_1 ul li {
+        width: 99.8%;
+        text-align: center;
+    }
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 ul li a {
+    color: #333;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 ul li a:hover {
+    color: #009BC2;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 ul li h3 {
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .price-box .price {
+    color: #009BC2;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .price-box .old-price,
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .price-box .special-price {
+    display: inline-block;
+    margin: 0;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .price-box .old-price .price-label,
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .price-box .special-price .price-label {
+    display: none;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .price-box .special-price {
+    color: #2B2A29;
+    padding: 0;
+    margin-left: 1.5em;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .price-box .special-price .price {
+    color: #009BC2;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .price-box .old-price .price {
+    color: #a0a0a0;
+    text-decoration: line-through;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .ratings .rating-box {
+    margin: 5px 0;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .ratings {
+    display: none;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_product_image {
+    width: 100%;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_product_image img {
+    width: 100%;
+    height: auto;
+    border: 1px solid transparent;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_product_image img:hover {
+    border: 1px solid #009BC2;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 {
+    position: relative;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls {
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_left_control,
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_right_control {
+    display: none;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_left_control[data-controls],
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_right_control[data-controls] {
+    display: flex;
+    position: absolute;
+    height: 60px;
+    line-height: 60px;
+    margin-top: 105px;
+    cursor: pointer;
+    background-color: #eeeeee;
+    opacity: 0.5;
+
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_left_control:hover,
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_right_control:hover {
+    opacity: 1;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_left_control:focus,
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_right_control:focus {
+    outline: none
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_left_control {
+    padding-right: 15px;
+    left: 0;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_right_control {
+    padding-left: 15px;
+    right: 0;
+
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_left_control .arrow,
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_right_control .arrow {
+    display: inline-block;
+    align-self: center;
+    width: 25px;
+    height: 0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_left_control .arrow {
+
+    border-right: 20px solid red;
+
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .stacc_recommender_controls .stacc_right_control .arrow {
+
+    border-left: 20px solid red;
+}
+
+.stacc_recommendations_container .stacc_recommender_recommendations_1 .tns-outer .tns-nav {
+    display: none;
+    left: 0;
+}

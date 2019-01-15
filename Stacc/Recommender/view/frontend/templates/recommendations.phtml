@@ -1,0 +1,72 @@
+<?php
+/** @var \Stacc\Recommender\Block\Recommendation $block */
+if ($exist = count($block->getItemCollection()->getItems())) {
+    $type = $block->getType();
+    $class = $type;
+
+    $image = 'upsell_products_list';
+    $title = $block->getTitle();
+    $items = $block->getItemCollection()->getItems();
+    $shuffle = 0;
+
+    $showAddTo = true;
+    $templateType = null;
+    $description = false;
+    $canItemsAddToCart = false;
+}
+?>
+
+<?php if ($exist): ?>
+    <div class="stacc_recommender_recommendations_1" data-lang="<?php echo $block->getLocaleCode() ?>" data-stacc-block-time="<?php echo $block->getTimestamp(); ?>">
+        <h2><?php echo $title ?></h2>
+
+        <ul class="stacc_recommender_col stacc_recommender_slider">
+            <?php $iterator = 1; ?>
+            <?php foreach ($items as $_item): ?>
+                <?php $available = ''; ?>
+
+                <?php if ($type == 'recommendations'): ?>
+                    <?= /* @escapeNotVerified */  ($iterator++ == 1) ? '<li class="stacc_recommender_item" style="display: none;">' : '</li><li class="stacc_recommender_item" style="display: none;">' ?>
+                <?php else: ?>
+                    <?= /* @escapeNotVerified */ ($iterator++ == 1) ? '<li class="stacc_recommender_item">' : '</li><li class="stacc_recommender_item">' ?>
+                <?php endif; ?>
+
+                <div class="stacc_recommender-info <?= /* @escapeNotVerified */ $available ?>">
+                    <?= /* @escapeNotVerified */ '<!-- ' . $image . '-->' ?>
+
+                    <a href="<?= /* @escapeNotVerified */ $block->getProductUrl($_item) ?>" class="stacc_recommender_product_image">
+                        <?= $block->getImage($_item, $image)->toHtml() ?>
+                    </a>
+
+                    <div class="stacc_recommender-item-details">
+                        <strong class="stacc_recommender_product_name">
+                            <a class="product-item-link" title="<?= $block->escapeHtml($_item->getName()) ?>" href="<?= /* @escapeNotVerified */ $block->getProductUrl($_item) ?>">
+                                <?= $block->escapeHtml($_item->getName()) ?>
+                            </a>
+                        </strong>
+
+                        <?= /* @escapeNotVerified */ $block->getProductPrice($_item) ?>
+
+                    </div>
+                </div>
+                <?= ($iterator == count($items) + 1) ? '</li>' : '' ?>
+            <?php endforeach ?>
+        </ul>
+        <div class="stacc_recommender_controls">
+            <div class="stacc_left_control">
+                <div class="arrow">
+
+                </div>
+            </div>
+            <div class="stacc_right_control">
+                <div class="arrow">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+<?php endif ?>
+
+
+

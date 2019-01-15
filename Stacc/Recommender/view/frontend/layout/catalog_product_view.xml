@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Stacc_Recommender::css/tiny-slider.css"/>
+        <css src="Stacc_Recommender::css/Recommender.css"/>
+        <script src="Stacc_Recommender::js/tiny-slider.min.js"/>
+        <script src="Stacc_Recommender::js/recommender.js"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <container name="product.info.recommendations" after="product.info.details">
+                <block class="Stacc\Recommender\Block\Container" name="recommendations.container" template="Stacc_Recommender::container.phtml">
+                    <arguments>
+                        <argument name="elementId" xsi:type="string">stacc_product_default</argument>
+
+                        <argument name="recommendationTemplate" xsi:type="string">Stacc_Recommender::recommendations.phtml</argument>
+                    </arguments>
+                </block>
+            </container>
+        </referenceContainer>
+    </body>
+</page>

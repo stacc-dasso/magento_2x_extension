@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="checkout_cart_product_add_after">
+        <observer name="stacc_recommender_model_observer" instance="Stacc\Recommender\Observer\Cart"/>
+    </event>
+    <event name="checkout_onepage_controller_success_action">
+        <observer name="stacc_recommender_model_observer" instance="Stacc\Recommender\Observer\Purchase"/>
+    </event>
+    <event name="catalog_controller_product_init_after">
+        <observer name="stacc_recommender_model_observer" instance="Stacc\Recommender\Observer\View"/>
+    </event>
+    <event name="controller_action_postdispatch_catalogsearch_result_index">
+        <observer name="stacc_recommender_model_observer" instance="Stacc\Recommender\Observer\Search"/>
+    </event>
+    <event name="admin_system_config_changed_section_stacc_recommender">
+        <observer name="stacc_recommender_model_observer" instance="Stacc\Recommender\Observer\Config"/>
+    </event>
+</config>
