@@ -10,11 +10,7 @@ use Stacc\Recommender\Logger\Logger;
 use Stacc\Recommender\Network\Environment;
 use Stacc\Recommender\Model\SyncFactory;
 
-/**
- * Class Sync
- * @package Stacc\Recommender\Controller\Recommendation
- */
-class Sync extends Action
+class Pages extends Action
 {
     /**
      * For store id verification to run on entered id
@@ -72,35 +68,28 @@ class Sync extends Action
      */
     public function execute()
     {
-        set_time_limit(300);
         try {
+            set_time_limit(300);
             $urlHash = (string)$this->getRequest()->getParam('h');
             $timestamp = $this->getRequest()->getParam('t');
 
             $storeId = $this->verifyId($this->getRequest()->getParam('s'), $this::TYPE_STORE);
-
             if ($this->auth_api($urlHash)) {
 
                 $sync = $this->_syncFactory->create();
 
-                $sync->syncProducts($storeId);
+                $pagesArr = $sync->getAmountOfPages($storeId);
+                $this->getResponse()->setBody(json_encode(array_merge($pagesArr, ['timestamp' => $timestamp])));
 
-                if (array_key_exists("data", $sync->getResponse())) {
-
-                    $this->getResponse()->setBody($timestamp . " " . $sync->getResponse()["data"]["transmitted"] . "/" . $sync->getResponse()["data"]["total"]);
-                } else {
-                    $this->getResponse()->setBody($timestamp . " " . json_encode($sync->getResponse()));
-                }
             } else {
                 $this->_logger->error("Failed to authenticate the request");
                 $this->getResponse()->setBody("");
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Sync.php->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->_logger->critical("controllers/RecommendationController->pagesAction() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return null;
         }
     }
-
     /**
      * Method that checks the hash of url
      *
@@ -113,7 +102,7 @@ class Sync extends Action
             $mainHash = hash("sha256", $this->_environment->getShopId() . $this->_environment->getApiKey());
             return $mainHash == $hash;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Sync.php->auth_api() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->_logger->critical("Controller/Recommendation/Product.php->auth_api() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return null;
         }
     }

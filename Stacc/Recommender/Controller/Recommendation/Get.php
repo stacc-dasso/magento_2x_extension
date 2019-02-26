@@ -66,7 +66,7 @@ class Get extends Action
             $this->getResponse()->setBody($block->toHtml())
                 ->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0', true);
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Get.phpexecute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->_logger->critical("Controller/Recommendation/Get.php->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             $this->getResponse()->setBody("");
             return null;
         }

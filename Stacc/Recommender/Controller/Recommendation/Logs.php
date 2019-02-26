@@ -66,19 +66,19 @@ class Logs extends Action
     public function execute()
     {
         try {
-            $url_hash = (string)$this->getRequest()->getParam('h');
+            $urlHash = (string)$this->getRequest()->getParam('h');
             $timestamp = $this->getRequest()->getParam('t');
 
-            if ($this->auth_api($url_hash)) {
+            if ($this->auth_api($urlHash)) {
                 $logger = $this->_logdispatcherFactory->create();
                 $logs = $logger->sendLogs();
-                $this->getResponse()->setBody($timestamp . " ". $logs->getSentAmount());
+                $this->getResponse()->setBody($timestamp . " " . $logs->getSentAmount());
             } else {
                 $this->_logger->error("Failed to authenticate the request");
                 $this->getResponse()->setBody("");
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("controllers/RecommendationController->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->_logger->critical("Controller/Recommendation/Logs.php->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return null;
         }
     }
@@ -96,7 +96,7 @@ class Logs extends Action
 
             return $mainHash == $hash;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Product.php->auth_api() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->_logger->critical("Controller/Recommendation/Logs.php->auth_api() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return null;
         }
     }

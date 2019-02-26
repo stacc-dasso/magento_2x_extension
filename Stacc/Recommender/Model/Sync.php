@@ -514,6 +514,7 @@ class Sync
             $this->productCollection->setVisibility($productVisibilityClass::VISIBILITY_BOTH);
             $this->productCollection->addAttributeToSelect('*');
             $this->productCollection->setFlag('has_stock_status_filter', true);
+            $this->productCollection->setOrder('product_id');
             $this->productCollection->setPageSize($this->getProductsPerPage());
             $this->productCollection->setCurPage($this->getCurrentPage());
 
@@ -523,6 +524,51 @@ class Sync
             $this->_logger->critical("Model/Sync->getProductsCollection() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return array();
         }
+    }
+
+    public function getAmountOfPages($storeId = null)
+    {
+        $this->setStoreId($storeId);
+        if ($this->getProductsCollection()) {
+            return ["products_amount" => $this->getProductsCollection()->getSize(), "per_page" => $this->getProductsPerPage(), "amount_of_pages" => $this->getProductsCollection()->getLastPageNumber()];
+        }
+        return false;
+    }
+
+    public function syncAPage($page, $storeId = null)
+    {
+        $transmitted = 0;
+        $errors = 0;
+        $this->initSync($storeId);
+        $this->setCurrentPage($page);
+        $products = $this->getProductsCollection();
+        $dataBulk = $this->getModifiedProductsAsBulk($products);
+        $amount = count($dataBulk);
+        $data_json = array(
+            "bulk" => $dataBulk,
+            "properties" => [
+                "current_page" => $page,
+                "total_pages" => 1,
+                "amount_of_products" => $amount,
+                "extension_version" => $this->getEnvironment()->getVersion(),
+                "store" => $this->getStoreId()
+            ]);
+        $syncResponse = $this->getApiclient()->sendProducts($data_json);
+        if ($syncResponse != "{}") {
+            $errors += 1;
+            $this->_logger->error("Can't send products", ['error' => strval($syncResponse)]);
+        } else {
+            $transmitted = $amount;
+        }
+        $this->response["data"] = ["total" => $amount, "transmitted" => $transmitted];
+
+        $this->setEndTime(microtime(true));
+
+        $sync_time = $this->getEndTime() - $this->getStartTime();
+
+        $this->_logger->notice("Synchronization finished, took $sync_time seconds, transmitted " . $transmitted . "/" . $amount . " products, " . $errors . " errors");
+
+        return array("errors" => $errors, "transmitted" => $transmitted, "count" => $amount, "pages" => 1);
     }
 
     /**
@@ -549,7 +595,8 @@ class Sync
 
                 // Build product structure to send
                 $newProduct = array(
-                    'item_id' => $productId, 'name' => $product->getName(),
+                    'item_id' => $productId,
+                    'name' => $product->getName(),
                     'price' => $product->getPrice(),
                     'currency' => $this->_environment->getCurrencyCode(),
                     'stores' => $this->getStoreCodes(),
