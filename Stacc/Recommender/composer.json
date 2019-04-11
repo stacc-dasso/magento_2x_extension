@@ -2,7 +2,7 @@
     "name": "stacc/recommender",
     "description": "STACC Recommender System",
     "type": "magento2-module",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "autoload": {
         "psr-4": { "Stacc\\Recommender\\": "" },
         "files": [ "registration.php" ]

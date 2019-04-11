@@ -6,7 +6,6 @@ use Stacc\Recommender\Network\Environment;
 use Stacc\Recommender\Logger\Logger;
 use Stacc\Recommender\Network\Apiclient;
 use Magento\Config\Block\System\Config\Form\Field;
-use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Phrase;
 use Magento\Backend\Block\Template\Context;
 
@@ -31,7 +30,7 @@ class Version extends Field
     protected $_logger;
 
     /**
-     * @var StoreManagerInterface
+     * @var
      */
     protected $_storeManager;
 
@@ -45,7 +44,6 @@ class Version extends Field
      * @param Environment $environment
      * @param Apiclient $apiclient
      * @param Logger $logger
-     * @param StoreManagerInterface $storeManager
      * @param Context $context
      * @param array $data
      */
@@ -53,7 +51,6 @@ class Version extends Field
         Environment $environment,
         Apiclient $apiclient,
         Logger $logger,
-        StoreManagerInterface $storeManager,
         Context $context, array $data = []
     )
     {
@@ -62,7 +59,7 @@ class Version extends Field
         $this->_environment = $environment;
         $this->_apiclient = $apiclient;
         $this->_logger = $logger;
-        $this->_storeManager = $storeManager;
+        $this->_storeManager = $context->getStoreManager();;
     }
 
     /**
