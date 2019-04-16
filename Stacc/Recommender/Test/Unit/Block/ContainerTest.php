@@ -73,7 +73,12 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
 
     public function testProductIdWillReturnValueOnException()
     {
-        $this->mockRegistry->expects($this->once())->method("registry")->with("product")->willReturn("")->willThrowException(new \Exception);
+        $this->mockRegistry
+            ->expects($this->once())
+            ->method("registry")
+            ->with("product")
+            ->willReturn("")
+            ->willThrowException(new \Exception);
 
         $this->mockLogger->expects($this->once())->method("critical");
         $result = $this->containerInstance->getProductId();
@@ -89,7 +94,11 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetExtensionVersionReturnsNullOnException()
     {
-        $this->mockEnvironment->expects($this->once())->method("getVersion")->willReturn("2.0.0")->willThrowException(new \Exception);
+        $this->mockEnvironment
+            ->expects($this->once())
+            ->method("getVersion")
+            ->willReturn("2.0.0")
+            ->willThrowException(new \Exception);
         $this->mockLogger->expects($this->once())->method("critical")->willReturn("");
         $result = $this->containerInstance->getExtensionVersion();
         $this->assertNull($result);

@@ -8,6 +8,8 @@ use Stacc\Recommender\Network\Apiclient;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Phrase;
 use Magento\Backend\Block\Template\Context;
+use Magento\Framework\UrlInterface;
+use Magento\Framework\Data\Form\Element\AbstractElement;
 
 /**
  * Class Version
@@ -18,26 +20,26 @@ class Version extends Field
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
     /**
      * @var Apiclient
      */
-    protected $_apiclient;
+    protected $apiclient;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * @var
      */
-    protected $_storeManager;
+    protected $storeManager;
 
     /**
      * @var
      */
-    protected $_element;
+    protected $element;
 
     /**
      * Version constructor.
@@ -51,40 +53,48 @@ class Version extends Field
         Environment $environment,
         Apiclient $apiclient,
         Logger $logger,
-        Context $context, array $data = []
-    )
-    {
+        Context $context,
+        array $data = []
+    ) {
         parent::__construct($context, $data);
 
-        $this->_environment = $environment;
-        $this->_apiclient = $apiclient;
-        $this->_logger = $logger;
-        $this->_storeManager = $context->getStoreManager();;
+        $this->environment = $environment;
+        $this->apiclient = $apiclient;
+        $this->logger = $logger;
+        $this->storeManager = $context->getStoreManager();
     }
 
     /**
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      */
-    protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    protected function _getElementHtml(AbstractElement $element)
     {
         try {
             if ($element) {
-                $this->_element = $element;
+                $this->element = $element;
             }
             $error = "";
-            $apiKey = $this->_environment->getApiKey();
-            $shopID = $this->_environment->getShopId();
+            $apiKey = $this->environment->getApiKey();
+            $shopID = $this->environment->getShopId();
 
             if ($apiKey && $shopID) {
                 $data = $this->buildData();
-                $request = $this->_apiclient->sendCheckCredentials($data);
+                $request = $this->apiclient->sendCheckCredentials($data);
                 $error = $this->requestResponse($request);
             }
 
-            return (string)$this->_environment->getVersion() . $error;
+            return (string)$this->environment->getVersion() . $error;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Block/Adminhtml/Menu/Field/Version->_getElementHtml() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Block/Adminhtml/Menu/Field/Version->_getElementHtml() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -99,15 +109,23 @@ class Version extends Field
     {
         if ($request != '{}') {
             if ($request && !json_decode($request)) {
-                return "<br/><span style='color:red'>" . new Phrase("Please check your API Key and Shop ID") . "</span>";
+                return "<br/><span style='color:red'>" .
+                    new Phrase("Please check your API Key and Shop ID") .
+                    "</span>";
             }
             if (!$request) {
-                return "<br/><span style='color:red'>" . new Phrase("Can't connect to STACC server") . "</span>";
+                return "<br/><span style='color:red'>" .
+                    new Phrase("Can't connect to STACC server") .
+                    "</span>";
             }
-            return "<br/><span style='color:red'>" . new Phrase("Failed to verify the Shop ID and the API Key") . "</span>";
-        } else if($request == '{}'){
-            return "<br/><span style='color:green'>" . new Phrase("Shop ID and API Key verified") . "</span>";
-        } else{
+            return "<br/><span style='color:red'>" .
+                new Phrase("Failed to verify the Shop ID and the API Key") .
+                "</span>";
+        } elseif ($request == '{}') {
+            return "<br/><span style='color:green'>" .
+                new Phrase("Shop ID and API Key verified") .
+                "</span>";
+        } else {
             return "<br/><span style='color:red'>" . new Phrase("Can't connect to STACC server") . "</span>";
         }
     }
@@ -118,23 +136,38 @@ class Version extends Field
     protected function buildData()
     {
         try {
-            $defaultStoreId = $this->_storeManager->getDefaultStoreView()->getId();
+            $defaultStoreId = $this->storeManager->getDefaultStoreView()->getId();
 
-            $defaultUrl = $this->_storeManager->getStore($defaultStoreId)->getUrl();
+            $defaultUrl = $this->storeManager->getStore($defaultStoreId)->getUrl();
 
             $data = [
-                "media_url" => $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . "catalog/product/",
-                "js" => $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_STATIC),
-                "skins" => $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_STATIC),
-                "base_url" => $this->_storeManager->getStore()->getBaseUrl(),
-                "direct_link" => $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_DIRECT_LINK),
+                "media_url" => $this->storeManager
+                        ->getStore()
+                        ->getBaseUrl(UrlInterface::URL_TYPE_MEDIA) . "catalog/product/",
+                "js" => $this->storeManager
+                    ->getStore()
+                    ->getBaseUrl(UrlInterface::URL_TYPE_STATIC),
+                "skins" => $this->storeManager
+                    ->getStore()
+                    ->getBaseUrl(UrlInterface::URL_TYPE_STATIC),
+                "base_url" => $this->storeManager->getStore()->getBaseUrl(),
+                "direct_link" => $this->storeManager
+                    ->getStore()
+                    ->getBaseUrl(UrlInterface::URL_TYPE_DIRECT_LINK),
                 "default_store" => $defaultUrl,
             ];
             return $data;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Block/Adminhtml/Menu/Field/Version->buildData() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Block/Adminhtml/Menu/Field/Version->buildData() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return [];
         }
     }
 }
-

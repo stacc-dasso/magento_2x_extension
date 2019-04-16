@@ -49,7 +49,10 @@ class EnvironmentTest extends TestCase
         $this->mockComponentRegistrar->expects($this->once())->method("getPath")->willReturn("../../..");
         $this->mockCustomerVisitor = $this->createMock(Visitor::class);
 
-        $this->mockScopeConfig = $this->getMockBuilder(ScopeConfigInterface::class)->disableOriginalConstructor()->getMock();
+        $this->mockScopeConfig = $this
+            ->getMockBuilder(ScopeConfigInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->mockResolver = $this->createMock(Resolver::class);
         $this->mockHeader = $this->createMock(Header::class);
@@ -78,9 +81,21 @@ class EnvironmentTest extends TestCase
 
     public function testIdentifyCustomerReturnsValue()
     {
-        $this->mockCustomerVisitor->expects($this->at(0))->method("getData")->with("session_id", null)->willReturn($this::TEST_SESSION_ID);
-        $this->mockCustomerVisitor->expects($this->at(1))->method("getData")->with("visitor_id", null)->willReturn($this::TEST_VISITOR_ID);
-        $this->mockCustomerVisitor->expects($this->at(2))->method("getData")->with("customer_id", null)->willReturn($this::TEST_CUSTOMER_ID);
+        $this->mockCustomerVisitor
+            ->expects($this->at(0))
+            ->method("getData")
+            ->with("session_id", null)
+            ->willReturn($this::TEST_SESSION_ID);
+        $this->mockCustomerVisitor
+            ->expects($this->at(1))
+            ->method("getData")
+            ->with("visitor_id", null)
+            ->willReturn($this::TEST_VISITOR_ID);
+        $this->mockCustomerVisitor
+            ->expects($this->at(2))
+            ->method("getData")
+            ->with("customer_id", null)
+            ->willReturn($this::TEST_CUSTOMER_ID);
         $result = $this->environmentInstance->identifyCustomer();
         $this->assertEquals([
             'session_id' => self::TEST_SESSION_ID,
@@ -91,7 +106,12 @@ class EnvironmentTest extends TestCase
 
     public function testIdentifyCustomerReturnsValueIfExceptionThrown()
     {
-        $this->mockCustomerVisitor->expects($this->at(0))->method("getData")->with("session_id", null)->willReturn($this::TEST_SESSION_ID)->willThrowException(new \Exception);
+        $this->mockCustomerVisitor
+            ->expects($this->at(0))
+            ->method("getData")
+            ->with("session_id", null)
+            ->willReturn($this::TEST_SESSION_ID)
+            ->willThrowException(new \Exception);
         $this->mockLogger->expects($this->once())->method("critical");
         $result = $this->environmentInstance->identifyCustomer();
         $this->assertEquals([], $result);
@@ -116,13 +136,19 @@ class EnvironmentTest extends TestCase
     public function testGetApiUrlReturnsValue()
     {
         $result = $this->environmentInstance->getApiUrl();
-        $this->assertRegExp("/http[s]?\:\/\/(recommender\.stacc\.cloud|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/api\/v2/", $result);
+        $this->assertRegExp(
+            "/http[s]?\:\/\/(recommender\.stacc\.cloud|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/api\/v3/",
+            $result
+        );
     }
 
     public function testGetM2UrlReturnsValue()
     {
         $result = $this->environmentInstance->getM2Url();
-        $this->assertRegExp("/http[s]?\:\/\/(recommender\.stacc\.cloud|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/api\/magento\/2x/", $result);
+        $this->assertRegExp(
+            "/http[s]?\:\/\/(recommender\.stacc\.cloud|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/api\/magento\/2x/",
+            $result
+        );
     }
 
     /**
@@ -132,8 +158,12 @@ class EnvironmentTest extends TestCase
      */
     public function testApiMethodReturnsCorrectUrl($method, $urlRegExp)
     {
-        $result = call_user_func(array($this->environmentInstance, $method));
-        $this->assertRegExp("/http[s]?\:\/\/(recommender\.stacc\.cloud|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/api\/v2" . $urlRegExp . "/", $result);
+        $result = call_user_func([$this->environmentInstance, $method]);
+        $this->assertRegExp(
+            "/http[s]?\:\/\/(recommender\.stacc\.cloud|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/api\/v3" .
+            $urlRegExp . "/",
+            $result
+        );
     }
 
     /**
@@ -143,14 +173,22 @@ class EnvironmentTest extends TestCase
      */
     public function testApiM1xMethodReturnsCorrectUrl($method, $urlRegExp)
     {
-        $result = call_user_func(array($this->environmentInstance, $method));
-        $this->assertRegExp("/http[s]?\:\/\/(recommender\.stacc\.cloud|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/api\/magento\/2x" . $urlRegExp . "/", $result);
+        $result = call_user_func([$this->environmentInstance, $method]);
+        $this->assertRegExp(
+            "/http[s]?\:\/\/(recommender\.stacc\.cloud|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/api\/magento\/2x" .
+            $urlRegExp . "/",
+            $result
+        );
     }
 
     public function testApiKeyReturnedIsValid()
     {
 
-        $this->mockScopeConfig->expects($this->once())->method("getValue")->with("stacc_recommender/configuration/stacc_api_key", \Magento\Store\Model\ScopeInterface::SCOPE_STORE)->willReturn(self::TEST_API_KEY);
+        $this->mockScopeConfig
+            ->expects($this->once())
+            ->method("getValue")
+            ->with("stacc_recommender/configuration/stacc_api_key", \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+            ->willReturn(self::TEST_API_KEY);
         $result = $this->environmentInstance->getApiKey();
         $this->assertEquals(self::TEST_API_KEY, $result);
     }
@@ -158,7 +196,11 @@ class EnvironmentTest extends TestCase
     public function testApiKeyReturnedValueIfExceptionThrown()
     {
 
-        $this->mockScopeConfig->expects($this->once())->method("getValue")->willReturn(self::TEST_API_KEY)->willThrowException(new \Exception);
+        $this->mockScopeConfig
+            ->expects($this->once())
+            ->method("getValue")
+            ->willReturn(self::TEST_API_KEY)
+            ->willThrowException(new \Exception);
 
         $this->mockLogger->expects($this->once())->method("critical");
         $result = $this->environmentInstance->getApiKey();
@@ -167,7 +209,11 @@ class EnvironmentTest extends TestCase
 
     public function testShopIdReturnedIsValid()
     {
-        $this->mockScopeConfig->expects($this->once())->method("getValue")->with('stacc_recommender/configuration/stacc_shop_id', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)->willReturn(self::TEST_SHOP_ID);
+        $this->mockScopeConfig
+            ->expects($this->once())
+            ->method("getValue")
+            ->with('stacc_recommender/configuration/stacc_shop_id', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+            ->willReturn(self::TEST_SHOP_ID);
         $result = $this->environmentInstance->getShopId();
         $this->assertEquals(self::TEST_SHOP_ID, $result);
     }
@@ -181,11 +227,18 @@ class EnvironmentTest extends TestCase
         $this->assertEquals("", $result);
     }
 
-
     public function testGetCredentialsReturnsValue()
     {
-        $this->mockScopeConfig->expects($this->at(0))->method("getValue")->with('stacc_recommender/configuration/stacc_shop_id', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)->willReturn(self::TEST_SHOP_ID);
-        $this->mockScopeConfig->expects($this->at(1))->method("getValue")->with("stacc_recommender/configuration/stacc_api_key", \Magento\Store\Model\ScopeInterface::SCOPE_STORE)->willReturn(self::TEST_API_KEY);
+        $this->mockScopeConfig
+            ->expects($this->at(0))
+            ->method("getValue")
+            ->with('stacc_recommender/configuration/stacc_shop_id', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+            ->willReturn(self::TEST_SHOP_ID);
+        $this->mockScopeConfig
+            ->expects($this->at(1))
+            ->method("getValue")
+            ->with("stacc_recommender/configuration/stacc_api_key", \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+            ->willReturn(self::TEST_API_KEY);
 
         $result = $this->environmentInstance->getCredentials();
         $this->assertEquals([
@@ -235,7 +288,10 @@ class EnvironmentTest extends TestCase
     public function testGetStoreReturnsNullOnException()
     {
 
-        $this->mockStoreManager->method("getStore")->willReturn($this->createMock(Store::class))->willThrowException(new \Exception);
+        $this->mockStoreManager
+            ->method("getStore")
+            ->willReturn($this->createMock(Store::class))
+            ->willThrowException(new \Exception);
         $this->mockLogger->expects($this->once())->method("critical");
         $result = $this->environmentInstance->getStore();
         $this->assertEquals(null, $result);
@@ -252,12 +308,15 @@ class EnvironmentTest extends TestCase
         $this->mockResolver->expects($this->once())->method("getLocale")->willReturn(self::TEST_LOCALE);
         $result = $this->environmentInstance->getLocaleCode();
         $this->assertEquals(self::TEST_LOCALE, $result);
-
     }
 
     public function testGetLocaleCodeReturnsValueOnException()
     {
-        $this->mockResolver->expects($this->once())->method("getLocale")->willReturn(self::TEST_LOCALE)->willThrowException(new \Exception);
+        $this->mockResolver
+            ->expects($this->once())
+            ->method("getLocale")
+            ->willReturn(self::TEST_LOCALE)
+            ->willThrowException(new \Exception);
         $this->mockLogger->expects($this->once())->method("critical");
         $result = $this->environmentInstance->getLocaleCode();
         $this->assertEquals("", $result);
@@ -284,7 +343,7 @@ class EnvironmentTest extends TestCase
             ['getRecommendationsURL', "\/get_recs"],
             ['getPurchaseEventURL', "\/send_purchase"],
             ['getViewEventURL', "\/send_view"],
-            ['getLogsURL', "\/send_logs"],
+            ['getLogsURL', "\/send_log"],
             ['getSearchEventURL', "\/send_search"]
         ];
     }
@@ -304,7 +363,7 @@ class EnvironmentTest extends TestCase
             ['get_recs', "/get_recs"],
             ['purchase', "/send_purchase"],
             ['view', "/send_view"],
-            ['logs', "/send_logs"],
+            ['log', "/send_log"],
             ['search', "/send_search"],
             ['check', "/check_credentials"]
         ];

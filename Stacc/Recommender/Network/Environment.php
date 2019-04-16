@@ -4,8 +4,6 @@ namespace Stacc\Recommender\Network;
 
 use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Component\ComponentRegistrar;
-use Magento\Framework\Component\ComponentRegistrarInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Customer\Model\Visitor;
 use Magento\Framework\Locale\Resolver;
@@ -26,62 +24,62 @@ class Environment
     /**
      * @var StoreManagerInterface
      */
-    protected $_storeManager;
+    protected $storeManager;
 
     /**
      * @var Visitor
      */
-    protected $_customerVisitor;
+    protected $customerVisitor;
 
     /**
      * @var ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    protected $scopeConfig;
 
     /**
      * @var Resolver
      */
-    protected $_resolver;
+    protected $resolver;
 
     /**
      * @var Header
      */
-    private $_header;
+    private $header;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * Path to STACC API
      *
      * @var array
      */
-    private $_baseApiUrl = "https://recommender.stacc.cloud/";
+    private $baseApiUrl = "https://recommender.stacc.cloud/";
 
     /**
      * List of api paths
      *
      * @var array
      */
-    private $_apiPaths = array(
-        "main_api" => "api/v2",
+    private $apiPaths = [
+        "main_api" => "api/v3",
         "m2x_api" => "api/magento/2x"
-    );
+    ];
 
     /**
      * Array of endpoints for extension
      *
      * @var array
      */
-    private $_endpoints = [
+    private $endpoints = [
         'add_to_cart' => '/send_add_to_cart',
         'catalog_sync' => '/catalog_sync',
         'get_recs' => '/get_recs',
         'purchase' => '/send_purchase',
         'view' => '/send_view',
-        'logs' => '/send_logs',
+        'log' => '/send_log',
         'search' => '/send_search',
         'check' => '/check_credentials'
     ];
@@ -91,17 +89,16 @@ class Environment
      *
      * @var int
      */
-    private $_timeout = 3000;
+    private $timeout = 3000;
 
     /**
      * Version number of extension
      * @var
      */
-    protected $_version;
+    protected $version = '4.0.0';
 
     /**
      * Environment constructor.
-     * @param ComponentRegistrarInterface $componentRegistrar
      * @param StoreManagerInterface $storeManager
      * @param Visitor $customerVisitor
      * @param ScopeConfigInterface $scopeConfig
@@ -110,26 +107,20 @@ class Environment
      * @param Logger $logger
      */
     public function __construct(
-        ComponentRegistrarInterface $componentRegistrar,
         StoreManagerInterface $storeManager,
         Visitor $customerVisitor,
         ScopeConfigInterface $scopeConfig,
         Resolver $resolver,
         Header $header,
         Logger $logger
-    )
-    {
-        $path = $componentRegistrar->getPath(ComponentRegistrar::MODULE, 'Stacc_Recommender');
-        $composerPath = $path . DIRECTORY_SEPARATOR . 'composer.json';
-        $composerConfig = json_decode(file_get_contents($composerPath), true);
-        $this->_version = $composerConfig['version'];
+    ) {
 
-        $this->_storeManager = $storeManager;
-        $this->_customerVisitor = $customerVisitor;
-        $this->_scopeConfig = $scopeConfig;
-        $this->_resolver = $resolver;
-        $this->_header = $header;
-        $this->_logger = $logger;
+        $this->storeManager = $storeManager;
+        $this->customerVisitor = $customerVisitor;
+        $this->scopeConfig = $scopeConfig;
+        $this->resolver = $resolver;
+        $this->header = $header;
+        $this->logger = $logger;
     }
 
     /**
@@ -140,7 +131,7 @@ class Environment
      */
     public function getEndpoint($value)
     {
-        return $this->_endpoints[$value];
+        return $this->endpoints[$value];
     }
 
     /**
@@ -151,7 +142,7 @@ class Environment
     public function identifyCustomer()
     {
         try {
-            $customer_visitor = $this->_customerVisitor;
+            $customer_visitor = $this->customerVisitor;
             $session_id = $customer_visitor->getData('session_id');
             $visitor_id = $customer_visitor->getData('visitor_id');
             $customer_id = $customer_visitor->getData('customer_id');
@@ -166,8 +157,16 @@ class Environment
             ];
             return $customer_info;
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->identifyCustomer() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-            return array();
+            $this->logger
+                ->critical(
+                    "Environment->identifyCustomer() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
+            return [];
         }
     }
 
@@ -181,7 +180,15 @@ class Environment
         try {
             return $this->getStore()->getCurrentCurrency()->getCode();
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->identifyCustomer() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->identifyCustomer() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -194,9 +201,17 @@ class Environment
     public function getApiUrl()
     {
         try {
-            return $this->_baseApiUrl . $this->_apiPaths["main_api"];
+            return $this->baseApiUrl . $this->apiPaths["main_api"];
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getApiUrl() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getApiUrl() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -209,9 +224,17 @@ class Environment
     public function getM2Url()
     {
         try {
-            return $this->_baseApiUrl . $this->_apiPaths["m2x_api"];
+            return $this->baseApiUrl . $this->apiPaths["m2x_api"];
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getApiUrl() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getApiUrl() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -226,7 +249,15 @@ class Environment
         try {
             return $this->getApiUrl() . $this->getEndpoint('get_recs');
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getRecommendationsURL() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getRecommendationsURL() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -241,7 +272,15 @@ class Environment
         try {
             return $this->getApiUrl() . $this->getEndpoint('view');
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getViewEventURL() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getViewEventURL() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -256,7 +295,15 @@ class Environment
         try {
             return $this->getApiUrl() . $this->getEndpoint('search');
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getSearchEventURL() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getSearchEventURL() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -271,7 +318,15 @@ class Environment
         try {
             return $this->getApiUrl() . $this->getEndpoint('add_to_cart');
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getAddToCartEventURL() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getAddToCartEventURL() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -286,7 +341,15 @@ class Environment
         try {
             return $this->getApiUrl() . $this->getEndpoint('purchase');
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getPurchaseEventURL() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getPurchaseEventURL() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -301,7 +364,15 @@ class Environment
         try {
             return $this->getApiUrl() . $this->getEndpoint('catalog_sync');
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getCatalogSyncURL() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getCatalogSyncURL() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -314,9 +385,17 @@ class Environment
     public function getLogsURL()
     {
         try {
-            return $this->getApiUrl() . $this->getEndpoint('logs');
+            return $this->getApiUrl() . $this->getEndpoint('log');
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getLogsURL() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getLogsURL() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -331,7 +410,15 @@ class Environment
         try {
             return $this->getM2Url() . $this->getEndpoint('check');
         } catch (Exception $exception) {
-            $this->_logger->critical("Helper/Environment->getCheckCredentialsURL(() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Helper/Environment->getCheckCredentialsURL(() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -344,9 +431,21 @@ class Environment
     public function getShopId()
     {
         try {
-            return $this->_scopeConfig->getValue('stacc_recommender/configuration/stacc_shop_id', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            return $this->scopeConfig
+                ->getValue(
+                    'stacc_recommender/configuration/stacc_shop_id',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                );
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getShopId() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getShopId() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -359,9 +458,21 @@ class Environment
     public function getApiKey()
     {
         try {
-            return $this->_scopeConfig->getValue('stacc_recommender/configuration/stacc_api_key', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            return $this->scopeConfig
+                ->getValue(
+                    'stacc_recommender/configuration/stacc_api_key',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                );
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getApiKey() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getApiKey() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -372,27 +483,43 @@ class Environment
     public function getCredentials()
     {
         try {
-            return array(
+            return [
                 "id" => $this->getShopId(),
                 "key" => $this->getApiKey()
-            );
+            ];
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getCredentials() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-            return array();
+            $this->logger
+                ->critical(
+                    "Environment->getCredentials() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
+            return [];
         }
     }
 
     /**
-     * Returns extension version from config.xml
+     * Returns extension version
      *
      * @return string
      */
     public function getVersion()
     {
         try {
-            return (string)$this->_version;
+            return (string)$this->version;
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getVersion() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getVersion() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -407,7 +534,15 @@ class Environment
         try {
             return $this->getStore()->getCode();
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getLang() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getLang() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -420,9 +555,17 @@ class Environment
     public function getWebsite()
     {
         try {
-            return $this->_storeManager->getWebsite()->getName();
+            return $this->storeManager->getWebsite()->getName();
         } catch (Exception $exception) {
-            $this->_logger->critical("Helper/Environment->getWebsite() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Helper/Environment->getWebsite() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -435,9 +578,17 @@ class Environment
     public function getStore()
     {
         try {
-            return $this->_storeManager->getStore();
+            return $this->storeManager->getStore();
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getStore() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getStore() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -452,7 +603,15 @@ class Environment
         try {
             return $this->getStore()->getCode();
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getStore() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getStore() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -465,9 +624,17 @@ class Environment
     public function getLocaleCode()
     {
         try {
-            return $this->_resolver->getLocale();
+            return $this->resolver->getLocale();
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getLocaleCode() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getLocaleCode() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -480,9 +647,17 @@ class Environment
     public function getTimeout()
     {
         try {
-            return $this->_timeout;
+            return $this->timeout;
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getLocaleCode() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getLocaleCode() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return 3000;
         }
     }
@@ -495,9 +670,17 @@ class Environment
     public function getUserAgent()
     {
         try {
-            return $this->_header->getHttpUserAgent() ?: self::CLI_USER_AGENT;
+            return $this->header->getHttpUserAgent() ?: self::CLI_USER_AGENT;
         } catch (Exception $exception) {
-            $this->_logger->critical("Environment->getLocaleCode() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Environment->getLocaleCode() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }

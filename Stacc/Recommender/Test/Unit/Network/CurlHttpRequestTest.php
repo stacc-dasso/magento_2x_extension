@@ -23,7 +23,11 @@ class CurlHttpRequestTest extends TestCase
         $this->mockLogger = $this->createMock(Logger::class);
         $this->mockCurl = $this->createMock(Curl::class);
         $this->mockEnvironment = $this->createMock(Environment::class);
-        $this->curlHttpRequestInstance = new CurlHttpRequest($this->mockEnvironment,$this->mockCurl, $this->mockLogger);
+        $this->curlHttpRequestInstance = new CurlHttpRequestInterface(
+            $this->mockEnvironment,
+            $this->mockCurl,
+            $this->mockLogger
+        );
     }
 
     public function testPostDataReturnsValueIfResponeCode200()
@@ -44,7 +48,11 @@ class CurlHttpRequestTest extends TestCase
 
     public function testPostDataReturnsValueIfExceptionIsThrown()
     {
-        $this->mockCurl->expects($this->once())->method("setOptions")->willReturn("This function ended in exception")->willThrowException(new \Exception);
+        $this->mockCurl
+            ->expects($this->once())
+            ->method("setOptions")
+            ->willReturn("This function ended in exception")
+            ->willThrowException(new \Exception);
         $this->mockLogger->expects($this->never())->method("error")->willReturn("{}");
         $this->mockLogger->expects($this->once())->method("critical")->willReturn("{}");
         $result = $this->curlHttpRequestInstance->postData([], $this::TEST_URL, $this::TEST_TIMEOUT);
@@ -56,7 +64,10 @@ class CurlHttpRequestTest extends TestCase
      */
     private function assertMethodsForPostDataAreRun($statusCode)
     {
-        $this->mockEnvironment->expects($this->once())->method("getCredentials")->willReturn(["id" => $this::TEST_SHOP_ID, "key" => $this::TEST_API_KEY]);
+        $this->mockEnvironment
+            ->expects($this->once())
+            ->method("getCredentials")
+            ->willReturn(["id" => $this::TEST_SHOP_ID, "key" => $this::TEST_API_KEY]);
         $this->mockCurl->expects($this->once())->method("setOptions")->willReturn($this->mockCurl);
         $this->mockCurl->expects($this->once())->method("post")->willReturn($this->mockCurl);
         $this->mockCurl->expects($this->once())->method("getBody")->willReturn("{}");

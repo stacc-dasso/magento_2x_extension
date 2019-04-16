@@ -20,27 +20,27 @@ class Pages extends Action
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
 
     /**
      * @var StoreManagerInterface
      */
-    protected $_storeManager;
+    protected $storeManager;
 
     /**
      * @var SyncFactory
      */
-    protected $_syncFactory;
+    protected $syncFactory;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * @var LayoutInterface
      */
-    protected $_layout;
+    protected $layout;
 
     /**
      * Sync constructor.
@@ -51,16 +51,22 @@ class Pages extends Action
      * @param LayoutInterface $layout
      * @param Context $context
      */
-    public function __construct(Environment $environment, StoreManagerInterface $storeManager, SyncFactory $syncFactory, Logger $logger, LayoutInterface $layout, Context $context)
-    {
+    public function __construct(
+        Environment $environment,
+        StoreManagerInterface $storeManager,
+        SyncFactory $syncFactory,
+        Logger $logger,
+        LayoutInterface $layout,
+        Context $context
+    ) {
         parent::__construct($context);
 
-        $this->_environment = $environment;
-        $this->_storeManager = $storeManager;
-        $this->_syncFactory = $syncFactory;
-        $this->_logger = $logger;
-        $this->_layout = $layout;
-        $this->_layout->getUpdate()->addHandle('default');
+        $this->environment = $environment;
+        $this->storeManager = $storeManager;
+        $this->syncFactory = $syncFactory;
+        $this->logger = $logger;
+        $this->layout = $layout;
+        $this->layout->getUpdate()->addHandle('default');
     }
 
     /**
@@ -74,19 +80,25 @@ class Pages extends Action
             $timestamp = $this->getRequest()->getParam('t');
 
             $storeId = $this->verifyId($this->getRequest()->getParam('s'), $this::TYPE_STORE);
-            if ($this->auth_api($urlHash)) {
-
-                $sync = $this->_syncFactory->create();
+            if ($this->authApi($urlHash)) {
+                $sync = $this->syncFactory->create();
 
                 $pagesArr = $sync->getAmountOfPages($storeId);
                 $this->getResponse()->setBody(json_encode(array_merge($pagesArr, ['timestamp' => $timestamp])));
-
             } else {
-                $this->_logger->error("Failed to authenticate the request");
+                $this->logger->error("Failed to authenticate the request");
                 $this->getResponse()->setBody("");
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("controllers/RecommendationController->pagesAction() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "controllers/RecommendationController->pagesAction() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -96,13 +108,21 @@ class Pages extends Action
      * @param $hash
      * @return bool
      */
-    private function auth_api($hash)
+    private function authApi($hash)
     {
         try {
-            $mainHash = hash("sha256", $this->_environment->getShopId() . $this->_environment->getApiKey());
+            $mainHash = hash("sha256", $this->environment->getShopId() . $this->environment->getApiKey());
             return $mainHash == $hash;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Product.php->auth_api() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Product.php->auth_api() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -119,7 +139,8 @@ class Pages extends Action
         try {
             if (isset($id)) {
                 if ($type == $this::TYPE_STORE) {
-                    $store = $this->_storeManager->getStore($id);;
+                    $store = $this->storeManager->getStore($id);
+                    ;
                     if ((int)$id && $store->getId()) {
                         return $id;
                     }
@@ -132,7 +153,15 @@ class Pages extends Action
             }
             return null;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Sync.php->verify_id() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Sync.php->verify_id() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }

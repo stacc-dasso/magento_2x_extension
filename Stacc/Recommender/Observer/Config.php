@@ -16,12 +16,12 @@ class Config implements ObserverInterface
     /**
      * @var Apiclient
      */
-    protected $_apiClient;
+    protected $apiclient;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * Config constructor.
@@ -30,8 +30,8 @@ class Config implements ObserverInterface
      */
     public function __construct(Apiclient $apiclient, Logger $logger)
     {
-        $this->_logger = $logger;
-        $this->_apiClient = $apiclient;
+        $this->logger = $logger;
+        $this->apiclient = $apiclient;
     }
 
     /**
@@ -41,10 +41,18 @@ class Config implements ObserverInterface
     {
         try {
             if ($observer->getEvent()) {
-                $this->_logger->info("Saved Shop ID and API Key");
+                $this->logger->info("Saved Shop ID and API Key");
             }
         } catch (\Exception $exception) {
-            $this->_logger->error("Observer/Config->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->error(
+                    "Observer/Config->execute() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
     }
 }

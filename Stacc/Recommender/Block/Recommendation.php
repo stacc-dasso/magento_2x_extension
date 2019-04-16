@@ -13,7 +13,6 @@ use Magento\Framework\Module\Manager;
 use Stacc\Recommender\Network\Environment;
 use Magento\Framework\Phrase;
 
-
 /**
  * Class Recommendation
  * @package Stacc\Recommender\Block
@@ -24,22 +23,22 @@ class Recommendation extends \Magento\Catalog\Block\Product\ProductList\Upsell
     /**
      * @var Recommendations
      */
-    protected $_recommendationsFactory;
+    protected $recommendationsFactory;
 
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
 
     /**
      * @var Collection
      */
-    protected $_collection;
+    protected $collection;
 
     /**
      * @var
      */
-    protected $_timestamp;
+    protected $timestamp;
 
     /**
      * Recommendation constructor.
@@ -61,15 +60,13 @@ class Recommendation extends \Magento\Catalog\Block\Product\ProductList\Upsell
         Visibility $catalogProductVisibility,
         Session $checkoutSession,
         Manager $moduleManager
-    )
-    {
+    ) {
         parent::__construct($context, $checkoutCart, $catalogProductVisibility, $checkoutSession, $moduleManager);
 
-        $this->_recommendationsFactory = $recommendationsFactory;
-        $this->_environment = $environment;
-        $this->_collection = $collection;
+        $this->recommendationsFactory = $recommendationsFactory;
+        $this->environment = $environment;
+        $this->collection = $collection;
     }
-
 
     /**
      * @return $this|\Magento\Catalog\Block\Product\ProductList\Upsell
@@ -77,18 +74,26 @@ class Recommendation extends \Magento\Catalog\Block\Product\ProductList\Upsell
     protected function _prepareData()
     {
         try {
-            $recommendationModel = $this->_recommendationsFactory->create();
+            $recommendationModel = $this->recommendationsFactory->create();
             $recommendations = $recommendationModel->getRecommendations($this->getProductId(), $this->getBlockId());
-            $this->_itemCollection = $this->_collection;
+            $this->_itemCollection = $this->collection;
             if (!empty($recommendations)) {
                 foreach ($recommendations as $row) {
-                    if (!$this->_collection->getItemById($row->getId())) {
+                    if (!$this->collection->getItemById($row->getId())) {
                         $this->_itemCollection->addItem($row);
                     }
                 }
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Block/Recommendation.php->_prepareData() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->_logger
+                ->critical(
+                    "Block/Recommendation.php->_prepareData() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
         return $this;
     }
@@ -106,7 +111,7 @@ class Recommendation extends \Magento\Catalog\Block\Product\ProductList\Upsell
      */
     public function getLocaleCode()
     {
-        return $this->_environment->getLocaleCode();
+        return $this->environment->getLocaleCode();
     }
 
     /**
@@ -124,7 +129,7 @@ class Recommendation extends \Magento\Catalog\Block\Product\ProductList\Upsell
      */
     public function getTimestamp()
     {
-        return $this->_timestamp;
+        return $this->timestamp;
     }
 
     /**
@@ -135,10 +140,9 @@ class Recommendation extends \Magento\Catalog\Block\Product\ProductList\Upsell
      */
     public function setTimestamp($timestamp)
     {
-        $this->_timestamp = $timestamp;
+        $this->timestamp = $timestamp;
         return $this;
     }
-
 
     /**
      * @return Phrase
@@ -155,7 +159,7 @@ class Recommendation extends \Magento\Catalog\Block\Product\ProductList\Upsell
     {
         if ($this->getTemplate() != "Stacc_Recommender::recommendations.phtml") {
             return "upsell";
-        } else{
+        } else {
             return 'recommendation';
         }
     }

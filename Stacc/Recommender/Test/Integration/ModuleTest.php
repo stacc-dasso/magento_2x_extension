@@ -42,12 +42,12 @@ class ModuleTest extends TestCase
 
     public function testTheModuleIsKnownAndEnabledInTheRealEnvironment()
     {
-        $directoryList = $this->objectManager->create(DirectoryList::class,['root'=>BP]);
+        $directoryList = $this->objectManager->create(DirectoryList::class, ['root'=>BP]);
         $configReader = $this->objectManager->create(DeploymentConfigReader::class, ['directoryList' => $directoryList]);
         $deploymentConfig = $this->objectManager->create(DeploymentConfig::class, ['reader' => $configReader]);
 
         $moduleList = $this->objectManager->create(ModuleList::class, ['config' => $deploymentConfig]);
-        $message = sprintf('The module "%s" is not enabled in the real environment',$this->moduleName);
+        $message = sprintf('The module "%s" is not enabled in the real environment', $this->moduleName);
         $this->assertTrue($moduleList->has($this->moduleName), $message);
     }
 }

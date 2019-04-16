@@ -23,97 +23,97 @@ class Sync
     /**
      * @var Apiclient
      */
-    protected $_apiclient;
+    protected $apiclient;
 
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
 
     /**
      * @var StoreManagerInterface
      */
-    protected $_storeManager;
+    protected $storeManager;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * @var ProductCollectionFactory
      */
-    protected $_productCollectionFactory;
+    protected $productCollectionFactory;
 
     /**
      * @var CategoryCollectionFactory
      */
-    protected $_catalogCollectionFactory;
+    protected $categoryCollectionFactory;
 
     /**
      * @var ReadHandler
      */
-    protected $_galleryReadHandler;
+    protected $galleryReadHandler;
 
     /**
      * @var Status
      */
-    protected $_productStatus;
+    protected $productStatus;
 
     /**
      * @var Visibility
      */
-    protected $_productVisibility;
+    protected $productVisibility;
 
     /**
      * @var Item
      */
-    protected $_stockItem;
+    protected $stockItem;
 
     /**
      * @var int
      */
-    protected $_productsPerPage = 250;
+    protected $productsPerPage = 250;
 
     /**
      * @var int
      */
-    protected $_curPage = 1;
+    protected $curPage = 1;
 
     /**
      * @var int
      */
-    protected $_storeId = null;
+    protected $storeId = null;
 
     /**
      * @var
      */
-    protected $_app;
+    protected $app;
 
     /**
      * @var
      */
-    protected $_startTime;
+    protected $startTime;
 
     /**
      * @var
      */
-    protected $_endTime;
+    protected $endTime;
 
     /**
      * @var array
      */
-    protected $_webIdName = array();
+    protected $webIdName = [];
 
     /**
      * @var array
      */
-    protected $_catIdName = array();
+    protected $catIdName = [];
 
     /**
      * @var array
      */
-    protected $_storeCodes = array();
+    protected $storeCodes = [];
 
     private $productCollection;
 
@@ -141,26 +141,24 @@ class Sync
         Status $productStatus,
         Visibility $_productVisibility,
         Item $stockItem
-    )
-    {
-        $this->_apiclient = $apiclient;
-        $this->_environment = $environment;
-        $this->_storeManager = $storeManager;
-        $this->_logger = $logger;
-        $this->_productCollectionFactory = $productCollectionFactory;
-        $this->_catalogCollectionFactory = $categoryCollectionFactory;
-        $this->_galleryReadHandler = $galleryReadHandler;
-        $this->_productStatus = $productStatus;
-        $this->_productVisibility = $_productVisibility;
-        $this->_stockItem = $stockItem;
-        $this->productCollection = $this->_productCollectionFactory->create();
+    ) {
+        $this->apiclient = $apiclient;
+        $this->environment = $environment;
+        $this->storeManager = $storeManager;
+        $this->logger = $logger;
+        $this->productCollectionFactory = $productCollectionFactory;
+        $this->categoryCollectionFactory = $categoryCollectionFactory;
+        $this->galleryReadHandler = $galleryReadHandler;
+        $this->productStatus = $productStatus;
+        $this->productVisibility = $_productVisibility;
+        $this->stockItem = $stockItem;
+        $this->productCollection = $this->productCollectionFactory->create();
     }
-
 
     /**
      * @var array
      */
-    protected $response = array();
+    protected $response = [];
 
     /**
      * @return StoreManagerInterface|null
@@ -168,9 +166,17 @@ class Sync
     public function getStoreManager()
     {
         try {
-            return $this->_storeManager;
+            return $this->storeManager;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->getStoreManager() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Sync->getStoreManager() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -180,7 +186,7 @@ class Sync
      */
     public function getStoreId()
     {
-        return $this->_storeId;
+        return $this->storeId;
     }
 
     /**
@@ -188,8 +194,8 @@ class Sync
      */
     private function setStoreId($storeId)
     {
-        if (!is_null($storeId)) {
-            $this->_storeId = $storeId;
+        if (!($storeId === null)) {
+            $this->storeId = $storeId;
         }
     }
 
@@ -200,7 +206,7 @@ class Sync
      */
     public function getApiclient()
     {
-        return $this->_apiclient;
+        return $this->apiclient;
     }
 
     /**
@@ -210,7 +216,7 @@ class Sync
      */
     public function getLogger()
     {
-        return $this->_logger;
+        return $this->logger;
     }
 
     /**
@@ -220,7 +226,7 @@ class Sync
      */
     public function getEnvironment()
     {
-        return $this->_environment;
+        return $this->environment;
     }
 
     /**
@@ -230,8 +236,8 @@ class Sync
      */
     private function setStartTime($startTime)
     {
-        if (!is_null($startTime)) {
-            $this->_startTime = $startTime;
+        if (!($startTime === null)) {
+            $this->startTime = $startTime;
         }
     }
 
@@ -242,7 +248,7 @@ class Sync
      */
     public function getStartTime()
     {
-        return $this->_startTime;
+        return $this->startTime;
     }
 
     /**
@@ -252,8 +258,8 @@ class Sync
      */
     private function setEndTime($endTime)
     {
-        if (!is_null($endTime)) {
-            $this->_endTime = $endTime;
+        if (!($endTime === null)) {
+            $this->endTime = $endTime;
         }
     }
 
@@ -264,7 +270,7 @@ class Sync
      */
     public function getEndTime()
     {
-        return $this->_endTime;
+        return $this->endTime;
     }
 
     /**
@@ -275,7 +281,7 @@ class Sync
     public function setProductsPerPage($productsPerPage)
     {
         if ($productsPerPage) {
-            $this->_productsPerPage = $productsPerPage;
+            $this->productsPerPage = $productsPerPage;
         }
     }
 
@@ -286,7 +292,7 @@ class Sync
      */
     public function getProductsPerPage()
     {
-        return $this->_productsPerPage;
+        return $this->productsPerPage;
     }
 
     /**
@@ -297,7 +303,7 @@ class Sync
     private function setCurrentPage($curPage)
     {
         if ($curPage) {
-            $this->_curPage = $curPage;
+            $this->curPage = $curPage;
         }
     }
 
@@ -308,7 +314,7 @@ class Sync
      */
     public function getCurrentPage()
     {
-        return $this->_curPage;
+        return $this->curPage;
     }
 
     /**
@@ -319,7 +325,7 @@ class Sync
     private function setStoreCodes($storeCodes)
     {
         if (is_array($storeCodes)) {
-            $this->_storeCodes = $storeCodes;
+            $this->storeCodes = $storeCodes;
         }
     }
 
@@ -330,7 +336,7 @@ class Sync
      */
     public function getStoreCodes()
     {
-        return $this->_storeCodes;
+        return $this->storeCodes;
     }
 
     /**
@@ -341,10 +347,9 @@ class Sync
      */
     private function setWebIdName($webIdKey, $webName)
     {
-        if (!is_null($webIdKey) && !is_null($webName)) {
-            $this->_webIdName[$webIdKey] = $webName;
+        if (!($webIdKey === null) && !($webName === null)) {
+            $this->webIdName[$webIdKey] = $webName;
         }
-
     }
 
     /**
@@ -354,7 +359,7 @@ class Sync
      */
     public function getWebIdName()
     {
-        return $this->_webIdName;
+        return $this->webIdName;
     }
 
     /**
@@ -365,8 +370,8 @@ class Sync
      */
     private function setCatIdName($catIdKey, $catName)
     {
-        if (!is_null($catIdKey) && !is_null($catName)) {
-            $this->_catIdName[$catIdKey] = $catName;
+        if (!($catIdKey === null) && !($catName === null)) {
+            $this->catIdName[$catIdKey] = $catName;
         }
     }
 
@@ -377,7 +382,7 @@ class Sync
      */
     public function getCatIdName()
     {
-        return $this->_catIdName;
+        return $this->catIdName;
     }
 
     /**
@@ -388,7 +393,7 @@ class Sync
      */
     public function syncProducts($storeId = null)
     {
-        $syncData = array("errors" => 0, "transmitted" => 0, "count" => 0, "pages" => 0);
+        $syncData = ["errors" => 0, "transmitted" => 0, "count" => 0, "pages" => 0];
 
         try {
             $this->initSync($storeId);
@@ -400,20 +405,29 @@ class Sync
                 }
 
                 $syncData = $this->processAndSendPage($syncData);
-
             } while ($this->getCurrentPage() <= $syncData["pages"]);
 
             $this->setEndTime(microtime(true));
 
             $sync_time = $this->getEndTime() - $this->getStartTime();
 
-            $this->_logger->notice("Synchronization finished, took $sync_time seconds, transmitted " . $syncData["transmitted"] . "/" . $syncData["count"] . " products, " . $syncData["errors"] . " errors");
-
+            $this->logger
+                ->notice(
+                    "Synchronization finished, took $sync_time seconds, transmitted " .
+                    $syncData["transmitted"] . "/" . $syncData["count"] . " products, " .
+                    $syncData["errors"] . " errors"
+                );
         } catch (\Exception $exception) {
-
-            $this->_logger->critical("Model/Sync->syncProducts() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Sync->syncProducts() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             $syncData["errors"]++;
-
         }
 
         return $this;
@@ -429,11 +443,19 @@ class Sync
         try {
             $this->setStartTime(microtime(true));
 
-            $this->_logger->notice("Running products synchronization");
+            $this->logger->notice("Running products synchronization");
 
             $this->setStoreId($storeId);
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->initSync() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Sync->initSync() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
     }
 
@@ -449,10 +471,9 @@ class Sync
             $pageStartTime = microtime(true);
 
             $currentPage = $this->getCurrentPage();
-            $this->_logger->info("Sending page " . $currentPage . " started");
+            $this->logger->info("Sending page " . $currentPage . " started");
 
             $productCollection = $this->getProductsCollection();
-
 
             if ($syncData["count"] == 0) {
                 $syncData["count"] = $productCollection->getSize();
@@ -461,18 +482,19 @@ class Sync
 
             $dataBulk = $this->getModifiedProductsAsBulk($productCollection);
 
-            $data_json = array(
-                "bulk" => $dataBulk,
+            $data_json = [
+                "bulk"       => $dataBulk,
                 "properties" => [
-                    "current_page" => $currentPage,
-                    "total_pages" => $syncData["pages"],
+                    "current_page"       => $currentPage,
+                    "total_pages"        => $syncData["pages"],
                     "amount_of_products" => $syncData["count"],
-                    "extension_version" => $this->getEnvironment()->getVersion(),
-                    "store" => $this->getStoreId()
-                ]);
+                    "extension_version"  => $this->getEnvironment()->getVersion(),
+                    "store"              => $this->getStoreId()
+                ]
+            ];
             $syncResponse = $this->getApiclient()->sendProducts($data_json);
             if ($syncResponse != "{}") {
-                $this->_logger->error("Can't send products", ['error' => strval($syncResponse)]);
+                $this->logger->error("Can't send products", ['error' => (string)$syncResponse]);
                 $syncData["errors"]++;
             } else {
                 $syncData["transmitted"] += count($dataBulk);
@@ -481,15 +503,23 @@ class Sync
             $productCollection->clear();
 
             $pageTime = microtime(true) - $pageStartTime;
-            $this->_logger->info("Sending page " . $currentPage . " finished, took $pageTime seconds");
+            $this->logger->info("Sending page " . $currentPage . " finished, took $pageTime seconds");
 
             $currentPage++;
             $this->setCurrentPage($currentPage);
 
             return $syncData;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->processAndSendPage() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-            return array();
+            $this->logger
+                ->critical(
+                    "Model/Sync->processAndSendPage() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
+            return [];
         }
     }
 
@@ -503,14 +533,19 @@ class Sync
 
         try {
             // Build product collection for sync
-            $productVisibilityClass = $this->_productVisibility;
+            $productVisibilityClass = $this->productVisibility;
 
-            if (!is_null($this->getStoreId())) {
+            if (!($this->getStoreId() === null)) {
                 $this->productCollection->setStore($this->getStoreId());
                 $this->productCollection->addStoreFilter($this->getStoreId());
             };
 
-            $this->productCollection->addAttributeToFilter('status', ['eq' => $this->_productStatus->getVisibleStatusIds()]);
+            $this->productCollection->addAttributeToFilter(
+                'status',
+                [
+                    'eq' => $this->productStatus->getVisibleStatusIds()
+                ]
+            );
             $this->productCollection->setVisibility($productVisibilityClass::VISIBILITY_BOTH);
             $this->productCollection->addAttributeToSelect('*');
             $this->productCollection->setFlag('has_stock_status_filter', true);
@@ -518,11 +553,18 @@ class Sync
             $this->productCollection->setPageSize($this->getProductsPerPage());
             $this->productCollection->setCurPage($this->getCurrentPage());
 
-
             return $this->productCollection;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->getProductsCollection() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-            return array();
+            $this->logger
+                ->critical(
+                    "Model/Sync->getProductsCollection() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
+            return [];
         }
     }
 
@@ -530,7 +572,11 @@ class Sync
     {
         $this->setStoreId($storeId);
         if ($this->getProductsCollection()) {
-            return ["products_amount" => $this->getProductsCollection()->getSize(), "per_page" => $this->getProductsPerPage(), "amount_of_pages" => $this->getProductsCollection()->getLastPageNumber()];
+            return [
+                "products_amount" => $this->getProductsCollection()->getSize(),
+                "per_page" => $this->getProductsPerPage(),
+                "amount_of_pages" => $this->getProductsCollection()->getLastPageNumber()
+            ];
         }
         return false;
     }
@@ -544,19 +590,20 @@ class Sync
         $products = $this->getProductsCollection();
         $dataBulk = $this->getModifiedProductsAsBulk($products);
         $amount = count($dataBulk);
-        $data_json = array(
-            "bulk" => $dataBulk,
+        $data_json = [
+            "bulk"       => $dataBulk,
             "properties" => [
-                "current_page" => $page,
-                "total_pages" => 1,
+                "current_page"       => $page,
+                "total_pages"        => 1,
                 "amount_of_products" => $amount,
-                "extension_version" => $this->getEnvironment()->getVersion(),
-                "store" => $this->getStoreId()
-            ]);
+                "extension_version"  => $this->getEnvironment()->getVersion(),
+                "store"              => $this->getStoreId()
+            ]
+        ];
         $syncResponse = $this->getApiclient()->sendProducts($data_json);
         if ($syncResponse != "{}") {
-            $errors += 1;
-            $this->_logger->error("Can't send products", ['error' => strval($syncResponse)]);
+            $errors ++;
+            $this->logger->error("Can't send products", ['error' => (string)$syncResponse]);
         } else {
             $transmitted = $amount;
         }
@@ -566,9 +613,14 @@ class Sync
 
         $sync_time = $this->getEndTime() - $this->getStartTime();
 
-        $this->_logger->notice("Synchronization finished, took $sync_time seconds, transmitted " . $transmitted . "/" . $amount . " products, " . $errors . " errors");
+        $this->logger
+            ->notice(
+                "Synchronization finished, took $sync_time seconds, transmitted " .
+                $transmitted . "/" . $amount . " products, " .
+                $errors . " errors"
+            );
 
-        return array("errors" => $errors, "transmitted" => $transmitted, "count" => $amount, "pages" => 1);
+        return ["errors" => $errors, "transmitted" => $transmitted, "count" => $amount, "pages" => 1];
     }
 
     /**
@@ -579,11 +631,10 @@ class Sync
      */
     public function getModifiedProductsAsBulk($productCollection)
     {
-        $dataBulk = array();
+        $dataBulk = [];
 
         try {
             foreach ($productCollection as $product) {
-
                 $version = $this->getEnvironment()->getVersion();
 
                 $productId = $product->getId();
@@ -591,45 +642,53 @@ class Sync
                 $webNames = $this->generateWebsitesList($product->getWebsiteIds());
                 $categoryNames = $this->generateCategoryList($product->getCategoryIds());
                 $storeData = $this->generateStores($product);
-                $stockItem = $this->_stockItem->load($product->getId(), 'product_id');
+                $stockItem = $this->stockItem->load($product->getId(), 'product_id');
 
                 // Build product structure to send
-                $newProduct = array(
-                    'item_id' => $productId,
-                    'name' => $product->getName(),
-                    'price' => $product->getPrice(),
-                    'currency' => $this->_environment->getCurrencyCode(),
-                    'stores' => $this->getStoreCodes(),
+                $newProduct = [
+                    'item_id'    => $productId,
+                    'name'       => $product->getName(),
+                    'price'      => $product->getPrice(),
+                    'currency'   => $this->environment->getCurrencyCode(),
+                    'stores'     => $this->getStoreCodes(),
                     'properties' => array_merge(
                         $product->getData(),
-                        array(
-                            'qty' => $stockItem->getQty(),
-                            'is_in_stock' => $stockItem->getIsInStock(),
-                            'state' => $product->getStatus(),
-                            'currency' => $product->getCurrencyCode(),
-                            'final_price' => $product->getFinalPrice(),
-                            'tax_amount' => $product->getTaxAmount(),
-                            'tax_rate' => $product->getTaxRate(),
-                            'prodcing' => $product->getPrice(),
-                            'imgUrl' => $this->generateImgUrl($product),
-                            'websites' => $webNames,
-                            'category_ids' => $product->getCategoryIds(),
-                            'category_names' => $categoryNames,
-                            'version' => $version,
-                            'upsell_products' => $product->getUpSellProductIds(),
+                        [
+                            'qty'                => $stockItem->getQty(),
+                            'is_in_stock'        => $stockItem->getIsInStock(),
+                            'state'              => $product->getStatus(),
+                            'currency'           => $product->getCurrencyCode(),
+                            'final_price'        => $product->getFinalPrice(),
+                            'tax_amount'         => $product->getTaxAmount(),
+                            'tax_rate'           => $product->getTaxRate(),
+                            'prodcing'           => $product->getPrice(),
+                            'imgUrl'             => $this->generateImgUrl($product),
+                            'websites'           => $webNames,
+                            'category_ids'       => $product->getCategoryIds(),
+                            'category_names'     => $categoryNames,
+                            'version'            => $version,
+                            'upsell_products'    => $product->getUpSellProductIds(),
                             'crosssell_products' => $product->getCrossSellProductIds(),
-                            'related_products' => $product->getRelatedProductIds(),
-                            'parent_id' => $this->generateParentIDs($product),
-                            'stores' => $storeData,
-                            'isSalable' => $product->isSalable()
-                        )
+                            'related_products'   => $product->getRelatedProductIds(),
+                            'parent_id'          => $this->generateParentIDs($product),
+                            'stores'             => $storeData,
+                            'isSalable'          => $product->isSalable()
+                        ]
                     )
-                );
+                ];
 
                 $dataBulk[] = $newProduct;
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->getModifiedProductsAsBulk() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Sync->getModifiedProductsAsBulk() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
 
         return $dataBulk;
@@ -643,13 +702,20 @@ class Sync
      */
     private function generateParentIDs($product)
     {
-        $parent_ids = array();
+        $parent_ids = [];
 
         try {
-
             $parent_ids = $product->getTypeInstance()->getParentIdsByChild($product->getId());
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->generateParentIDs() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Sync->generateParentIDs() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
 
         return $parent_ids;
@@ -663,13 +729,13 @@ class Sync
      */
     private function generateStores($product)
     {
-        $storeData = array();
+        $storeData = [];
         try {
             $storeIds = $product->getStoreIds();
-            $storeCodes = array();
+            $storeCodes = [];
             // Check if product has storeIds()
             if (!empty($storeIds)) {
-                $storeInfo = array();
+                $storeInfo = [];
                 foreach ($storeIds as $storeId) {
                     $store = $this->getStoreManager()->getStore($storeId);
                     $storeCodes[] = $store->getCode();
@@ -677,14 +743,28 @@ class Sync
                     $storeInfo["name"] = $store->getName();
                     $storeInfo["id"] = $storeId;
                     $storeInfo["storeInUrl"] = $store->getStoreInUrl();
-                    $storeInfo["group"] = [$store->getGroup()->getId() => ["name" => $store->getGroup()->getName(), "id" => $store->getGroup()->getId(), "data" => $store->getGroup()->getData()]];
+                    $storeInfo["group"] = [
+                        $store->getGroup()->getId() => [
+                            "name" => $store->getGroup()->getName(),
+                            "id" => $store->getGroup()->getId(),
+                            "data" => $store->getGroup()->getData()
+                        ]
+                    ];
                     $storeInfo['store_data'] = $store->getData();
                     $storeData[$storeId] = $storeInfo;
                 }
                 $this->setStoreCodes($storeCodes);
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->generateStores() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Sync->generateStores() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
 
         return $storeData;
@@ -701,7 +781,7 @@ class Sync
         $imgUrl = "";
 
         try {
-            $this->_galleryReadHandler->execute($product);
+            $this->galleryReadHandler->execute($product);
 
             $imgUrl = "";
             if ($product->getMediaGalleryImages()) {
@@ -710,9 +790,16 @@ class Sync
                     break;
                 }
             }
-
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->generateImgUrl() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Sync->generateImgUrl() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
         return $imgUrl;
     }
@@ -725,7 +812,7 @@ class Sync
      */
     private function generateCategoryList($categoryIds)
     {
-        $categoryNames = array();
+        $categoryNames = [];
 
         try {
             // Check if product has categoryIds()
@@ -739,14 +826,20 @@ class Sync
                     $catIdName = $this->getCatIdName();
                     $categoryNames[] = $catIdName["_$catId"];
                 }
-
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->generateCategoryList() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Sync->generateCategoryList() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
         return $categoryNames;
     }
-
 
     /**
      * Populate Category Dict
@@ -757,8 +850,8 @@ class Sync
     private function populateCatIdNameDict($categoryIds)
     {
         try {
-            $categoryCollection = $this->_catalogCollectionFactory->create()
-                ->addAttributeToSelect(array('name', 'is_active'))
+            $categoryCollection = $this->categoryCollectionFactory->create()
+                ->addAttributeToSelect(['name', 'is_active'])
                 ->addAttributeToFilter('entity_id', $categoryIds);
 
             foreach ($categoryCollection as $cat) {
@@ -775,11 +868,18 @@ class Sync
                 }
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->populateIdNameDict() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Sync->populateIdNameDict() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
         return $this->getCatIdName();
     }
-
 
     /**
      * Function to generate Array of product Websites
@@ -789,13 +889,12 @@ class Sync
      */
     private function generateWebsitesList($webIds)
     {
-        $webNames = array();
+        $webNames = [];
 
         try {
             // Check if product has webIds
             if (!empty($webIds)) {
                 foreach ($webIds as $webId) {
-
                     // check if key _$webId doesn't exist in $webIdName Array
                     if (!array_key_exists("_$webId", $this->getWebIdName())) {
                         // populate dict for $webIdName
@@ -806,7 +905,15 @@ class Sync
                 }
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->generateCategoryList() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Sync->generateCategoryList() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
 
         return $webNames;
@@ -829,10 +936,17 @@ class Sync
                         $this->setWebIdName("_$websiteId", $websiteName);
                     }
                 }
-
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Sync->populateWebsiteIdNameDict() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Sync->populateWebsiteIdNameDict() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
         return $this->getWebIdName();
     }
@@ -846,5 +960,4 @@ class Sync
     {
         return $this->response;
     }
-
 }

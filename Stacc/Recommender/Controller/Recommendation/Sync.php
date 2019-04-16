@@ -24,27 +24,27 @@ class Sync extends Action
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
 
     /**
      * @var StoreManagerInterface
      */
-    protected $_storeManager;
+    protected $storeManager;
 
     /**
      * @var SyncFactory
      */
-    protected $_syncFactory;
+    protected $syncFactory;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * @var LayoutInterface
      */
-    protected $_layout;
+    protected $layout;
 
     /**
      * Sync constructor.
@@ -55,16 +55,22 @@ class Sync extends Action
      * @param LayoutInterface $layout
      * @param Context $context
      */
-    public function __construct(Environment $environment, StoreManagerInterface $storeManager, SyncFactory $syncFactory, Logger $logger, LayoutInterface $layout, Context $context)
-    {
+    public function __construct(
+        Environment $environment,
+        StoreManagerInterface $storeManager,
+        SyncFactory $syncFactory,
+        Logger $logger,
+        LayoutInterface $layout,
+        Context $context
+    ) {
         parent::__construct($context);
 
-        $this->_environment = $environment;
-        $this->_storeManager = $storeManager;
-        $this->_syncFactory = $syncFactory;
-        $this->_logger = $logger;
-        $this->_layout = $layout;
-        $this->_layout->getUpdate()->addHandle('default');
+        $this->environment = $environment;
+        $this->storeManager = $storeManager;
+        $this->syncFactory = $syncFactory;
+        $this->logger = $logger;
+        $this->layout = $layout;
+        $this->layout->getUpdate()->addHandle('default');
     }
 
     /**
@@ -79,24 +85,34 @@ class Sync extends Action
 
             $storeId = $this->verifyId($this->getRequest()->getParam('s'), $this::TYPE_STORE);
 
-            if ($this->auth_api($urlHash)) {
-
-                $sync = $this->_syncFactory->create();
+            if ($this->authApi($urlHash)) {
+                $sync = $this->syncFactory->create();
 
                 $sync->syncProducts($storeId);
 
                 if (array_key_exists("data", $sync->getResponse())) {
-
-                    $this->getResponse()->setBody($timestamp . " " . $sync->getResponse()["data"]["transmitted"] . "/" . $sync->getResponse()["data"]["total"]);
+                    $this->getResponse()
+                        ->setBody(
+                            $timestamp . " " .
+                            $sync->getResponse()["data"]["transmitted"] . "/" . $sync->getResponse()["data"]["total"]
+                        );
                 } else {
                     $this->getResponse()->setBody($timestamp . " " . json_encode($sync->getResponse()));
                 }
             } else {
-                $this->_logger->error("Failed to authenticate the request");
+                $this->logger->error("Failed to authenticate the request");
                 $this->getResponse()->setBody("");
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Sync.php->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Sync.php->execute() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -107,13 +123,21 @@ class Sync extends Action
      * @param $hash
      * @return bool
      */
-    private function auth_api($hash)
+    private function authApi($hash)
     {
         try {
-            $mainHash = hash("sha256", $this->_environment->getShopId() . $this->_environment->getApiKey());
+            $mainHash = hash("sha256", $this->environment->getShopId() . $this->environment->getApiKey());
             return $mainHash == $hash;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Sync.php->auth_api() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Sync.php->auth_api() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -130,7 +154,8 @@ class Sync extends Action
         try {
             if (isset($id)) {
                 if ($type == $this::TYPE_STORE) {
-                    $store = $this->_storeManager->getStore($id);;
+                    $store = $this->storeManager->getStore($id);
+                    ;
                     if ((int)$id && $store->getId()) {
                         return $id;
                     }
@@ -143,7 +168,15 @@ class Sync extends Action
             }
             return null;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Sync.php->verify_id() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Sync.php->verify_id() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }

@@ -21,17 +21,17 @@ class Recommendations extends AbstractModel
     /**
      * @var Apiclient
      */
-    protected $_apiclient;
+    protected $apiclient;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * @var CollectionFactory
      */
-    protected $_productCollectionFactory;
+    protected $productCollectionFactory;
 
     /**
      * Recommendations constructor.
@@ -43,13 +43,21 @@ class Recommendations extends AbstractModel
      * @param AbstractDb|null $resourceCollection
      * @param array $data
      */
-    public function __construct(Apiclient $apiclient, Logger $logger, CollectionFactory $collectionFactory, Context $context, Registry $registry, AbstractResource $resource = null, AbstractDb $resourceCollection = null, array $data = [])
-    {
+    public function __construct(
+        Apiclient $apiclient,
+        Logger $logger,
+        CollectionFactory $collectionFactory,
+        Context $context,
+        Registry $registry,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
 
-        $this->_apiclient = $apiclient;
-        $this->_logger = $logger;
-        $this->_productCollectionFactory = $collectionFactory;
+        $this->apiclient = $apiclient;
+        $this->logger = $logger;
+        $this->productCollectionFactory = $collectionFactory;
     }
 
     /**
@@ -59,13 +67,13 @@ class Recommendations extends AbstractModel
      */
     public function getRecommendations($productId, $blockId)
     {
-        $recommendations = array();
+        $recommendations = [];
 
         try {
-            $productIds = $this->_apiclient->askRecommendations($productId, $blockId);
+            $productIds = $this->apiclient->askRecommendations($productId, $blockId);
 
-            $collection = $this->_productCollectionFactory->create()
-                ->addAttributeToFilter('entity_id', array('in' => $productIds))
+            $collection = $this->productCollectionFactory->create()
+                ->addAttributeToFilter('entity_id', ['in' => $productIds])
                 ->addAttributeToSelect('*')
                 ->addFinalPrice();
 
@@ -74,9 +82,16 @@ class Recommendations extends AbstractModel
                     $recommendations[] = $product;
                 }
             }
-
         } catch (\Exception $exception) {
-            $this->_logger->critical("Model/Recommendations.php->getRecommendations() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Model/Recommendations.php->getRecommendations() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
 
         return $recommendations;

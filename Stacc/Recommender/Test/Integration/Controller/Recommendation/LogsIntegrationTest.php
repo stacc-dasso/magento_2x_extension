@@ -26,7 +26,7 @@ class LogsIntegrationTest extends AbstractController
         $string = $this->getResponse()->getBody();
         $this->assertRegExp("/" . $time . "/", $string);
         $stringTimeAndSyncArray = explode(" ", $string);
-        if (strpos($string,"/" ) !== false) {
+        if (strpos($string, "/") !== false) {
             $stringArray = explode("/", $stringTimeAndSyncArray[1]);
             $this->assertContains('/', $string);
             $this->assertEquals($stringArray[1], $stringArray[0]);

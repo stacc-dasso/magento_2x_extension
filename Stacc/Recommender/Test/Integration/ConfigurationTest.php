@@ -7,8 +7,8 @@ use Magento\TestFramework\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use Monolog\Handler\StreamHandler;
 use Stacc\Recommender\Logger\Logger;
-use Stacc\Recommender\Network\CurlHttpRequest;
-use Stacc\Recommender\Network\HttpRequest;
+use Stacc\Recommender\Network\CurlHttpRequestInterface;
+use Stacc\Recommender\Network\HttpRequestInterface;
 
 /**
  * Class ConfigurationTest
@@ -83,7 +83,12 @@ class ConfigurationTest extends TestCase
     {
         $this->assertVirtualType(Logger::class, $this->configFileLoggerType);
         $this->assertDiArgumentSame("FileLogger", $this->configFileLoggerType, "name");
-        $this->assertDiArgumentArrayInstanceSame($this->configFileHandlerType, $this->configFileLoggerType, "handlers", "file");
+        $this->assertDiArgumentArrayInstanceSame(
+            $this->configFileHandlerType,
+            $this->configFileLoggerType,
+            "handlers",
+            "file"
+        );
     }
 
     public function testConfigFileHandlerVirtualType()
@@ -95,7 +100,7 @@ class ConfigurationTest extends TestCase
 
     public function testConfigHasCorrectHttpRequestPreference()
     {
-        $this->assertPreference(CurlHttpRequest::class, HttpRequest::class);
+        $this->assertPreference(CurlHttpRequestInterface::class, HttpRequestInterface::class);
     }
 
     public function testConfigHasCorrectLoggerPreference()
@@ -103,7 +108,8 @@ class ConfigurationTest extends TestCase
         $this->assertPreference($this->configFileLoggerType, Logger::class);
     }
 
-    public function testConfigCanBeAccessed(){
+    public function testConfigCanBeAccessed()
+    {
         $diConfig = ObjectManager::getInstance()->create($this->configFileLoggerType);
         $diExtensionVersion = $diConfig->getExtensionVersion();
         $this->assertRegExp("/^[0-9]?[0-9]\.[0-9]?[0-9]\.[0-9]?[0-9]$/", $diExtensionVersion);
@@ -117,8 +123,5 @@ class ConfigurationTest extends TestCase
     {
         /** @var ObjectManagerConfig $diConfig */
         return ObjectManager::getInstance()->get(ObjectManagerConfig::class);
-
     }
-
-
 }

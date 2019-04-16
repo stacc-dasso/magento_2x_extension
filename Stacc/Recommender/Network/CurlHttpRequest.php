@@ -2,7 +2,6 @@
 
 namespace Stacc\Recommender\Network;
 
-
 use Stacc\Recommender\Logger\Logger;
 use \Magento\Framework\HTTP\Client\Curl;
 
@@ -10,23 +9,23 @@ use \Magento\Framework\HTTP\Client\Curl;
  * Class CurlHttpRequest
  * @package Stacc\Recommender\Network
  */
-class CurlHttpRequest implements HttpRequest
+class CurlHttpRequest implements HttpRequestInterface
 {
 
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * @var Curl
      */
-    protected $_curl;
+    protected $curl;
 
     /**
      * CurlHttpRequest constructor.
@@ -36,11 +35,10 @@ class CurlHttpRequest implements HttpRequest
      */
     public function __construct(Environment $environment, Curl $curl, Logger $logger)
     {
-        $this->_environment = $environment;
-        $this->_curl = $curl;
-        $this->_logger = $logger;
+        $this->environment = $environment;
+        $this->curl = $curl;
+        $this->logger = $logger;
     }
-
 
     /**
      * Method to send data
@@ -53,10 +51,10 @@ class CurlHttpRequest implements HttpRequest
     public function postData($data, $url, $timeout = 3000)
     {
         try {
-            $credentials = $this->_environment->getCredentials();
+            $credentials = $this->environment->getCredentials();
 
             // Init request
-            $this->_curl->setOptions(
+            $this->curl->setOptions(
                 [
                     CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                     CURLOPT_USERPWD => $credentials['id'] . ":" . $credentials['key'],
@@ -66,21 +64,27 @@ class CurlHttpRequest implements HttpRequest
                 ]
             );
 
-            $this->_curl->post($url, json_encode($data));
+            $this->curl->post($url, json_encode($data));
             // Send request
-            $output = $this->_curl->getBody();
-            $httpcode = $this->_curl->getStatus();
+            $output = $this->curl->getBody();
+            $httpcode = $this->curl->getStatus();
 
             if ($httpcode != 200) {
-                $this->_logger->error("Received error from HTTP request", ['error' => strval($httpcode)]);
+                $this->logger->error("Received error from HTTP request", ['error' => (string)$httpcode]);
             }
 
             return $output;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Network/Httprequest->postData() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Network/Httprequest->postData() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return '{"error": "Failed to start a connection!"}';
         }
-
     }
-
 }

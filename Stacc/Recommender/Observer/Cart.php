@@ -16,12 +16,12 @@ class Cart implements ObserverInterface
     /**
      * @var Apiclient
      */
-    protected $_apiClient;
+    protected $apiClient;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * AddToCart constructor.
@@ -31,8 +31,8 @@ class Cart implements ObserverInterface
      */
     public function __construct(Apiclient $apiClient, Logger $logger)
     {
-        $this->_apiClient = $apiClient;
-        $this->_logger = $logger;
+        $this->apiClient = $apiClient;
+        $this->logger = $logger;
     }
 
     /**
@@ -41,14 +41,21 @@ class Cart implements ObserverInterface
     public function execute(Observer $observer)
     {
         try {
-            $response = $this->_apiClient->sendAddToCartEvent($observer->getEvent()->getProduct()->getId());
+            $response = $this->apiClient->sendAddToCartEvent($observer->getEvent()->getProduct()->getId());
 
             if (!$response) {
-                $this->_logger->error("Failed to sync purchase event", array($response));
+                $this->logger->error("Failed to sync purchase event", [$response]);
             }
-
         } catch (\Exception $exception) {
-            $this->_logger->critical("Observer/Cart->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Observer/Cart->execute() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
     }
 }

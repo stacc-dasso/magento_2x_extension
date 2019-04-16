@@ -24,7 +24,6 @@ class ApiclientTest extends TestCase
 
     const CURRENT_TIME = 100000;
 
-
     private $mockLogger;
 
     private $mockCookie;
@@ -40,8 +39,13 @@ class ApiclientTest extends TestCase
         $this->mockLogger = $this->createMock(Logger::class);
         $this->mockCookie = $this->createMock(Cookie::class);
         $this->mockEnvironment = $this->createMock(Environment::class);
-        $this->mockHttpRequest = $this->createMock(HttpRequest::class);
-        $this->apiclientInstance = new Apiclient($this->mockEnvironment, $this->mockHttpRequest, $this->mockCookie, $this->mockLogger);
+        $this->mockHttpRequest = $this->createMock(HttpRequestInterface::class);
+        $this->apiclientInstance = new Apiclient(
+            $this->mockEnvironment,
+            $this->mockHttpRequest,
+            $this->mockCookie,
+            $this->mockLogger
+        );
     }
 
     // Get Instances In Apiclient
@@ -58,7 +62,7 @@ class ApiclientTest extends TestCase
 
     public function testReturnsHttpRequest()
     {
-        $this->assertInstanceOf(HttpRequest::class, $this->apiclientInstance->getHttpRequest());
+        $this->assertInstanceOf(HttpRequestInterface::class, $this->apiclientInstance->getHttpRequest());
     }
 
     // Recommendation Event Related Method tests
@@ -196,7 +200,11 @@ class ApiclientTest extends TestCase
      */
     private function mockHttpRequestThrowsException($method, $returns, $exception)
     {
-        $this->mockHttpRequest->expects($this->once())->method($method)->willReturn($returns)->willThrowException($exception);
+        $this->mockHttpRequest
+            ->expects($this->once())
+            ->method($method)
+            ->willReturn($returns)
+            ->willThrowException($exception);
     }
 
     /**

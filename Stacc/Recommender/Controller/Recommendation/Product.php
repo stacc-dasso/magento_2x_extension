@@ -25,32 +25,31 @@ class Product extends Action
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
 
     /**
      * @var SyncFactory
      */
-    protected $_syncFactory;
+    protected $syncFactory;
 
     /**
      * @var StoreManagerInterface
      */
-    protected $_storeManager;
+    protected $storeManager;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * @var CollectionFactory
      */
-    protected $_productCollectionFactory;
+    protected $productCollectionFactory;
     /**
      * @var LayoutInterface
      */
-    protected $_layout;
-
+    protected $layout;
 
     /**
      * Product constructor.
@@ -62,18 +61,24 @@ class Product extends Action
      * @param LayoutInterface $layout
      * @param Context $context
      */
-    public function __construct(Environment $environment, SyncFactory $syncFactory, StoreManagerInterface $storeManager, CollectionFactory $collectionFactory, Logger $logger, LayoutInterface $layout, Context $context)
-    {
+    public function __construct(
+        Environment $environment,
+        SyncFactory $syncFactory,
+        StoreManagerInterface $storeManager,
+        CollectionFactory $collectionFactory,
+        Logger $logger,
+        LayoutInterface $layout,
+        Context $context
+    ) {
         parent::__construct($context);
 
-        $this->_environment = $environment;
-        $this->_syncFactory = $syncFactory;
-        $this->_storeManager = $storeManager;
-        $this->_productCollectionFactory = $collectionFactory;
-        $this->_logger = $logger;
-        $this->_layout = $layout;
-        $this->_layout->getUpdate()->addHandle('default');
-
+        $this->environment = $environment;
+        $this->syncFactory = $syncFactory;
+        $this->storeManager = $storeManager;
+        $this->productCollectionFactory = $collectionFactory;
+        $this->logger = $logger;
+        $this->layout = $layout;
+        $this->layout->getUpdate()->addHandle('default');
     }
 
     /**
@@ -86,19 +91,18 @@ class Product extends Action
             $timestamp = $this->getRequest()->getParam('t');
             $productId = $this->verifyId($this->getRequest()->getParam('p'), $this::TYPE_PRODUCT);
 
-            if ($this->auth_api($url_hash)) {
-
+            if ($this->authApi($url_hash)) {
                 $response = [
-                    "product" => array(),
+                    "product" => [],
                     "timestamp" => $timestamp
                 ];
 
                 if ($productId) {
-                    $collection = $this->_productCollectionFactory
+                    $collection = $this->productCollectionFactory
                         ->create()
                         ->addAttributeToSelect('*')
-                        ->addAttributeToFilter('entity_id', array('in' => $productId));
-                    $syncModel = $this->_syncFactory->create();
+                        ->addAttributeToFilter('entity_id', ['in' => $productId]);
+                    $syncModel = $this->syncFactory->create();
                     $bulk = $syncModel->getModifiedProductsAsBulk($collection);
                 } else {
                     $bulk = [];
@@ -108,11 +112,19 @@ class Product extends Action
 
                 $this->getResponse()->setBody(json_encode($response));
             } else {
-                $this->_logger->error("Failed to authenticate the request");
+                $this->logger->error("Failed to authenticate the request");
                 $this->getResponse()->setBody("");
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Product.php->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Product.php->execute() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -123,15 +135,22 @@ class Product extends Action
      * @param $hash
      * @return bool
      */
-    private function auth_api($hash)
+    private function authApi($hash)
     {
         try {
-
-            $mainHash = hash("sha256", $this->_environment->getShopId() . $this->_environment->getApiKey());
+            $mainHash = hash("sha256", $this->environment->getShopId() . $this->environment->getApiKey());
 
             return $mainHash == $hash;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Product.php->auth_api() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Product.php->auth_api() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -148,10 +167,10 @@ class Product extends Action
         try {
             if (isset($id)) {
                 if ($type == $this::TYPE_PRODUCT) {
-                    $product = $this->_productCollectionFactory
+                    $product = $this->productCollectionFactory
                         ->create()
                         ->addAttributeToSelect("sku")
-                        ->addAttributeToFilter('entity_id', array('in' => $id));
+                        ->addAttributeToFilter('entity_id', ['in' => $id]);
                     if ((int)$id && $product) {
                         return $id;
                     }
@@ -164,7 +183,15 @@ class Product extends Action
             }
             return null;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Product.php->verify_id() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Product.php->verify_id() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }

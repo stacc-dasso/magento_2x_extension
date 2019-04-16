@@ -17,7 +17,8 @@ class StoresIntegrationTest extends AbstractController
         $this->_objectManager->addSharedInstance($environment, Environment::class);
     }
 
-    public function testRendersSuccessfulSyncResponse() {
+    public function testRendersSuccessfulSyncResponse()
+    {
         $time = time();
         $this->dispatch('recommender/recommendation/stores?h='.hash("sha256", $this::TEST_SHOP_ID.$this::TEST_API_KEY)."&t=".$time);
         $string = $this->getResponse()->getBody();

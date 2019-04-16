@@ -17,17 +17,17 @@ class Check extends Action
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * @var LayoutInterface
      */
-    protected $_layout;
+    protected $layout;
 
     /**
      * Check constructor.
@@ -40,10 +40,10 @@ class Check extends Action
     {
         parent::__construct($context);
 
-        $this->_environment = $environment;
-        $this->_logger = $logger;
-        $this->_layout = $layout;
-        $this->_layout->getUpdate()->addHandle('default');
+        $this->environment = $environment;
+        $this->logger = $logger;
+        $this->layout = $layout;
+        $this->layout->getUpdate()->addHandle('default');
     }
 
     /**
@@ -55,14 +55,22 @@ class Check extends Action
             $urlHash = (string)$this->getRequest()->getParam('h');
             $timestamp = $this->getRequest()->getParam('t');
 
-            if ($this->auth_api($urlHash)) {
+            if ($this->authApi($urlHash)) {
                 $this->getResponse()->setBody($timestamp);
             } else {
-                $this->_logger->error("Failed to authenticate the request");
+                $this->logger->error("Failed to authenticate the request");
                 $this->getResponse()->setBody("");
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Check.php->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Check.php->execute() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             $this->getResponse()->setBody("");
             return null;
         }
@@ -74,15 +82,22 @@ class Check extends Action
      * @param $hash
      * @return bool
      */
-    private function auth_api($hash)
+    private function authApi($hash)
     {
         try {
-
-            $mainHash = hash("sha256", $this->_environment->getShopId() . $this->_environment->getApiKey());
+            $mainHash = hash("sha256", $this->environment->getShopId() . $this->environment->getApiKey());
 
             return $mainHash == $hash;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Check.php->auth_api() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Check.php->auth_api() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }

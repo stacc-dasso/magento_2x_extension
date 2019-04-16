@@ -1,6 +1,6 @@
 <?php
 /** @var \Stacc\Recommender\Block\Recommendation $block */
-if ($exist = count($block->getItemCollection()->getItems())) {
+if ($exist = !empty($block->getItemCollection()->getItems())) {
     $type = $block->getType();
     $class = $type;
 
@@ -16,18 +16,18 @@ if ($exist = count($block->getItemCollection()->getItems())) {
 }
 ?>
 
-<?php if ($exist): ?>
+<?php if ($exist) : ?>
     <div class="stacc_recommender_recommendations_1" data-lang="<?php echo $block->getLocaleCode() ?>" data-stacc-block-time="<?php echo $block->getTimestamp(); ?>">
         <h2><?php echo $title ?></h2>
 
         <ul class="stacc_recommender_col stacc_recommender_slider">
             <?php $iterator = 1; ?>
-            <?php foreach ($items as $_item): ?>
+            <?php foreach ($items as $_item) : ?>
                 <?php $available = ''; ?>
 
-                <?php if ($type == 'recommendations'): ?>
+                <?php if ($type == 'recommendations') : ?>
                     <?= /* @escapeNotVerified */  ($iterator++ == 1) ? '<li class="stacc_recommender_item" style="display: none;">' : '</li><li class="stacc_recommender_item" style="display: none;">' ?>
-                <?php else: ?>
+                <?php else : ?>
                     <?= /* @escapeNotVerified */ ($iterator++ == 1) ? '<li class="stacc_recommender_item">' : '</li><li class="stacc_recommender_item">' ?>
                 <?php endif; ?>
 

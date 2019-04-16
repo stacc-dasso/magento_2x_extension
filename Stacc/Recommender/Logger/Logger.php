@@ -20,7 +20,7 @@ class Logger extends \Monolog\Logger
     /**
      * @var
      */
-    protected $_version;
+    protected $version;
 
     /**
      * Logger constructor.
@@ -33,9 +33,8 @@ class Logger extends \Monolog\Logger
         JsonFormatter $jsonFormatter,
         ComponentRegistrarInterface $componentRegistrar,
         $name,
-        array $handlers = array()
-    )
-    {
+        array $handlers = []
+    ) {
         if (array_key_exists("file", $handlers)) {
             $handlers["file"]->setFormatter($jsonFormatter);
         }
@@ -45,7 +44,7 @@ class Logger extends \Monolog\Logger
         $path = $componentRegistrar->getPath(ComponentRegistrar::MODULE, 'Stacc_Recommender');
         $composerPath = $path . DIRECTORY_SEPARATOR . 'composer.json';
         $composerConfig = json_decode(file_get_contents($composerPath), true);
-        $this->_version = $composerConfig['version'];
+        $this->version = $composerConfig['version'];
     }
 
     /**
@@ -54,7 +53,7 @@ class Logger extends \Monolog\Logger
      * @param array $context
      * @return bool
      */
-    public function addRecord($level, $message, array $context = array())
+    public function addRecord($level, $message, array $context = [])
     {
         if (!$this->handlers) {
             $this->pushHandler(new StreamHandler('php://stderr', static::DEBUG));
@@ -65,7 +64,7 @@ class Logger extends \Monolog\Logger
         // check if any handler will handle this message so we can return early and save cycles
         $handlerKey = null;
         foreach ($this->handlers as $key => $handler) {
-            if ($handler->isHandling(array('level' => $level))) {
+            if ($handler->isHandling(['level' => $level])) {
                 $handlerKey = $key;
                 break;
             }
@@ -79,15 +78,15 @@ class Logger extends \Monolog\Logger
             static::$timezone = new \DateTimeZone(date_default_timezone_get() ?: 'UTC');
         }
 
-        $record = array(
+        $record = [
             'channel' => self::CHANNEL,
             'level' => $level,
             'msg' => (string)$message,
             'timestamp' => time(),
             'context' => $context,
             'level_name' => $levelName,
-            'extension_version' => $this->_version
-        );
+            'extension_version' => $this->version
+        ];
 
         foreach ($this->processors as $processor) {
             $record["processors"] = $processor;
@@ -106,6 +105,6 @@ class Logger extends \Monolog\Logger
      */
     public function getExtensionVersion()
     {
-        return $this->_version;
+        return $this->version;
     }
 }

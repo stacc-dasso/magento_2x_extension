@@ -18,22 +18,22 @@ class Stores extends Action
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
 
     /**
      * @var StoreManagerInterface
      */
-    protected $_storeManager;
+    protected $storeManager;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * @var LayoutInterface
      */
-    protected $_layout;
+    protected $layout;
 
     /**
      * Stores constructor.
@@ -43,15 +43,20 @@ class Stores extends Action
      * @param LayoutInterface $layout
      * @param Context $context
      */
-    public function __construct(Environment $environment, StoreManagerInterface $storeManager, Logger $logger, LayoutInterface $layout, Context $context)
-    {
+    public function __construct(
+        Environment $environment,
+        StoreManagerInterface $storeManager,
+        Logger $logger,
+        LayoutInterface $layout,
+        Context $context
+    ) {
         parent::__construct($context);
 
-        $this->_environment = $environment;
-        $this->_storeManager = $storeManager;
-        $this->_logger = $logger;
-        $this->_layout = $layout;
-        $this->_layout->getUpdate()->addHandle('default');
+        $this->environment = $environment;
+        $this->storeManager = $storeManager;
+        $this->logger = $logger;
+        $this->layout = $layout;
+        $this->layout->getUpdate()->addHandle('default');
     }
 
     /**
@@ -61,14 +66,22 @@ class Stores extends Action
     {
         try {
             $url_hash = (string)$this->getRequest()->getParam('h');
-            if ($this->auth_api($url_hash)) {
+            if ($this->authApi($url_hash)) {
                 $this->getResponse()->setBody(json_encode($this->getStoreData()));
             } else {
-                $this->_logger->error("Failed to authenticate the request");
+                $this->logger->error("Failed to authenticate the request");
                 $this->getResponse()->setBody("");
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Stores.php->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Stores.php->execute() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -79,14 +92,22 @@ class Stores extends Action
      * @param $hash
      * @return bool
      */
-    private function auth_api($hash)
+    private function authApi($hash)
     {
         try {
-            $mainHash = hash("sha256", $this->_environment->getShopId() . $this->_environment->getApiKey());
+            $mainHash = hash("sha256", $this->environment->getShopId() . $this->environment->getApiKey());
 
             return $mainHash == $hash;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Stores.php->auth_api() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Stores.php->auth_api() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -98,15 +119,23 @@ class Stores extends Action
     {
         try {
             $timestamp = $this->getRequest()->getParam('t');
-            $stores = $this->_storeManager->getStores();
-            $storeData = array("timestamp" => $timestamp);
+            $stores = $this->storeManager->getStores();
+            $storeData = ["timestamp" => $timestamp];
             foreach (array_keys($stores) as $storeId) {
-                $store = $this->_storeManager->getStore($storeId);
+                $store = $this->storeManager->getStore($storeId);
                 $storeData[$storeId] = $this->mapStoreInfo($storeId, $store);
             }
             return $storeData;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Stores.php->generateStoreData() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Stores.php->generateStoreData() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return [];
         }
     }
@@ -124,7 +153,13 @@ class Stores extends Action
         $storeInfo["storeInUrl"] = $store->getStoreInUrl();
         $storeInfo['store_data'] = $store->getData();
         $storeInfo["website"] = [$store->getWebsite()->getId() => $store->getWebsite()->getData()];
-        $storeInfo["group"] = [$store->getGroup()->getId() => ["name" => $store->getGroup()->getName(), "id" => $store->getGroup()->getId(), "data" => $store->getGroup()->getData()]];
+        $storeInfo["group"] = [
+            $store->getGroup()->getId() => [
+                "name" => $store->getGroup()->getName(),
+                "id" => $store->getGroup()->getId(),
+                "data" => $store->getGroup()->getData()
+            ]
+        ];
         return $storeInfo;
     }
 }

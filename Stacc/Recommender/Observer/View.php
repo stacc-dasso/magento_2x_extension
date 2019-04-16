@@ -16,12 +16,12 @@ class View implements ObserverInterface
     /**
      * @var Apiclient
      */
-    protected $_apiClient;
+    protected $apiclient;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * View constructor.
@@ -30,8 +30,8 @@ class View implements ObserverInterface
      */
     public function __construct(Apiclient $apiclient, Logger $logger)
     {
-        $this->_apiClient = $apiclient;
-        $this->_logger = $logger;
+        $this->apiclient = $apiclient;
+        $this->logger = $logger;
     }
 
     /**
@@ -42,10 +42,18 @@ class View implements ObserverInterface
         try {
             if ($observer->getEvent()->getProduct()) {
                 $productId = $observer->getEvent()->getProduct()->getId();
-                $this->_apiClient->sendViewEvent($productId);
+                $this->apiclient->sendViewEvent($productId);
             }
         } catch (\Exception $exception) {
-            $this->_logger->error("Observer/View->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->error(
+                    "Observer/View->execute() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
     }
 }

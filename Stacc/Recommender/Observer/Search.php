@@ -11,21 +11,22 @@ use Magento\Search\Model\QueryFactory;
  * Class Search
  * @package Stacc\Recommender\Observer
  */
-class Search implements ObserverInterface{
+class Search implements ObserverInterface
+{
     /**
      * @var Apiclient
      */
-    protected $_apiClient;
+    protected $apiclient;
 
     /**
      * @var QueryFactory
      */
-    protected $_queryFactory;
+    protected $queryFactory;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * Search constructor.
@@ -35,9 +36,9 @@ class Search implements ObserverInterface{
      */
     public function __construct(Apiclient $apiclient, QueryFactory $queryFactory, Logger $logger)
     {
-        $this->_apiClient = $apiclient;
-        $this->_queryFactory = $queryFactory;
-        $this->_logger = $logger;
+        $this->apiclient = $apiclient;
+        $this->queryFactory = $queryFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -47,11 +48,19 @@ class Search implements ObserverInterface{
     {
         try {
             if ($observer->getEvent()) {
-                $query = $this->_queryFactory->get()->getQueryText();
-                $this->_apiClient->sendSearchEvent($query);
+                $query = $this->queryFactory->get()->getQueryText();
+                $this->apiclient->sendSearchEvent($query);
             }
         } catch (\Exception $exception) {
-            $this->_logger->error("Observer/Search->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->error(
+                    "Observer/Search->execute() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
     }
 }

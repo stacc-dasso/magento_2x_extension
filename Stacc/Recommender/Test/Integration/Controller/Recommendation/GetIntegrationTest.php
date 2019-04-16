@@ -51,5 +51,4 @@ class GetIntegrationTest extends AbstractController
         $this->assertContains('data-product-id="1"', $this->getResponse()->getBody());
         $this->assertContains('data-product-id="2"', $this->getResponse()->getBody());
     }
-
 }

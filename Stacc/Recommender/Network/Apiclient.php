@@ -16,41 +16,40 @@ class Apiclient
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
 
     /**
-     * @var HttpRequest
+     * @var HttpRequestInterface
      */
-    protected $_httpRequest;
-
-    /**
-     * @var Logger
-     */
-    protected $_cookie;
+    protected $httpRequest;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $cookie;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
 
     /**
      * Apiclient constructor.
      * @param Environment $environment
-     * @param HttpRequest $httpRequest
+     * @param HttpRequestInterface $httpRequest
      * @param Cookie $cookie
      * @param Logger $logger
      */
     public function __construct(
         Environment $environment,
-        HttpRequest $httpRequest,
+        HttpRequestInterface $httpRequest,
         Cookie $cookie,
         Logger $logger
-    )
-    {
-        $this->_environment = $environment;
-        $this->_httpRequest = $httpRequest;
-        $this->_cookie = $cookie;
-        $this->_logger = $logger;
+    ) {
+        $this->environment = $environment;
+        $this->httpRequest = $httpRequest;
+        $this->cookie = $cookie;
+        $this->logger = $logger;
     }
 
     /**
@@ -58,15 +57,15 @@ class Apiclient
      */
     public function getEnvironment()
     {
-        return $this->_environment;
+        return $this->environment;
     }
 
     /**
-     * @return HttpRequest
+     * @return HttpRequestInterface
      */
     public function getHttpRequest()
     {
-        return $this->_httpRequest;
+        return $this->httpRequest;
     }
 
     /**
@@ -74,7 +73,7 @@ class Apiclient
      */
     public function getLogger()
     {
-        return $this->_logger;
+        return $this->logger;
     }
 
     /**
@@ -87,8 +86,8 @@ class Apiclient
     public function askRecommendations($productId, $blockId)
     {
         try {
-            $environment = $this->_environment;
-            $httpRequest = $this->_httpRequest;
+            $environment = $this->environment;
+            $httpRequest = $this->httpRequest;
 
             $data = $this->createDataArrayForRecsRequest($productId, $blockId, $environment);
 
@@ -103,14 +102,20 @@ class Apiclient
             if (isset($json_output->items)) {
                 return $json_output->items;
             } else {
-                return array();
+                return [];
             }
-
         } catch (Exception $exception) {
-            $this->_logger->critical("Apiclient->askRecommendations() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-            return array();
+            $this->logger
+                ->critical(
+                    "Apiclient->askRecommendations() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
+            return [];
         }
-
     }
 
     /**
@@ -122,8 +127,8 @@ class Apiclient
     public function sendViewEvent($productId)
     {
         try {
-            $environment = $this->_environment;
-            $httpRequest = $this->_httpRequest;
+            $environment = $this->environment;
+            $httpRequest = $this->httpRequest;
             $data = $this->createDataArrayForRequest($productId, $environment);
 
             $url = $environment->getViewEventURL();
@@ -134,7 +139,15 @@ class Apiclient
 
             return $output;
         } catch (Exception $exception) {
-            $this->_logger->critical("Apiclient->sendViewEvent() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Apiclient->sendViewEvent() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "{}";
         }
     }
@@ -146,11 +159,11 @@ class Apiclient
      * @param array $filters
      * @return mixed
      */
-    public function sendSearchEvent($query, $filters = array())
+    public function sendSearchEvent($query, $filters = [])
     {
         try {
-            $environment = $this->_environment;
-            $httpRequest = $this->_httpRequest;
+            $environment = $this->environment;
+            $httpRequest = $this->httpRequest;
             $customerInfo = $environment->identifyCustomer();
             $website = $environment->getWebsite();
             $storeCode = $environment->getStoreCode();
@@ -170,7 +183,15 @@ class Apiclient
             $output = $httpRequest->postData($data, $url, $timeout);
             return $output;
         } catch (Exception $exception) {
-            $this->_logger->critical("Apiclient->sendSearchEvent() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Apiclient->sendSearchEvent() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "{}";
         }
     }
@@ -184,8 +205,8 @@ class Apiclient
     public function sendAddToCartEvent($productId)
     {
         try {
-            $environment = $this->_environment;
-            $httpRequest = $this->_httpRequest;
+            $environment = $this->environment;
+            $httpRequest = $this->httpRequest;
 
             $data = $this->createDataArrayForRequest($productId, $environment);
 
@@ -197,7 +218,15 @@ class Apiclient
 
             return $output;
         } catch (Exception $exception) {
-            $this->_logger->critical("Apiclient->sendAddToCartEvent() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Apiclient->sendAddToCartEvent() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "{}";
         }
     }
@@ -211,8 +240,8 @@ class Apiclient
     public function sendPurchaseEvent($itemsArray)
     {
         try {
-            $environment = $this->_environment;
-            $httpRequest = $this->_httpRequest;
+            $environment = $this->environment;
+            $httpRequest = $this->httpRequest;
 
             $data = $this->createDataArrayForPurchaseRequest($itemsArray, $environment);
 
@@ -224,7 +253,14 @@ class Apiclient
 
             return $output;
         } catch (Exception $exception) {
-            $this->_logger->critical("Apiclient->sendPurchaseEvent() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Apiclient->sendPurchaseEvent() Exception: ",
+                    [
+                        get_class($exception),
+                    $exception->getMessage(),
+                    $exception->getCode()]
+                );
             return "{}";
         }
     }
@@ -238,9 +274,8 @@ class Apiclient
     public function sendProducts($bulk)
     {
         try {
-
-            $environment = $this->_environment;
-            $httpRequest = $this->_httpRequest;
+            $environment = $this->environment;
+            $httpRequest = $this->httpRequest;
 
             $url = $environment->getCatalogSyncURL();
 
@@ -250,7 +285,15 @@ class Apiclient
 
             return $output;
         } catch (Exception $exception) {
-            $this->_logger->critical("Apiclient->sendProducts() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Apiclient->sendProducts() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "{data: false, error: true}";
         }
     }
@@ -264,8 +307,8 @@ class Apiclient
     public function sendLogs($logs)
     {
         try {
-            $environment = $this->_environment;
-            $httpRequest = $this->_httpRequest;
+            $environment = $this->environment;
+            $httpRequest = $this->httpRequest;
             $data = [
                 'logs' => $logs,
                 'properties' => [
@@ -281,7 +324,15 @@ class Apiclient
 
             return $output;
         } catch (Exception $exception) {
-            $this->_logger->critical("Apiclient->sendPurchaseEvent() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Apiclient->sendPurchaseEvent() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "{}";
         }
     }
@@ -306,11 +357,18 @@ class Apiclient
 
             return $output;
         } catch (Exception $exception) {
-            $this->_logger->critical("Helper/Apiclient->sendCheckCredentials() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Helper/Apiclient->sendCheckCredentials() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return false;
         }
     }
-
 
     /**
      * Returns properties about website and extension for the events
@@ -325,7 +383,7 @@ class Apiclient
     {
 
         try {
-            $environment = $this->_environment;
+            $environment = $this->environment;
 
             $customerInfo = $customerInfo ?: $environment->identifyCustomer();
             $website = $website ?: $environment->getWebsite();
@@ -335,7 +393,7 @@ class Apiclient
             $currencyCode = $currency ?: $environment->getCurrencyCode();
             $extVersion = $environment->getVersion();
             $localeCode = $environment->getLocaleCode();
-            $cookie = $this->_cookie->isUserNotAllowSaveCookie();
+            $cookie = $this->cookie->isUserNotAllowSaveCookie();
             return array_merge(
                 $customerInfo,
                 [
@@ -350,8 +408,16 @@ class Apiclient
                 ]
             );
         } catch (Exception $exception) {
-            $this->_logger->critical("Apiclient->getProperties() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-            return array();
+            $this->logger
+                ->critical(
+                    "Apiclient->getProperties() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
+            return [];
         }
     }
 

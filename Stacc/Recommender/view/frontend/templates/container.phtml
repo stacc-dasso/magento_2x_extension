@@ -1,10 +1,11 @@
-<div id="<?php echo $this->getElementId() ?>"
+<div id="<?php echo $block->getElementId() ?>"
      class="stacc_recommendations_container"
-     data-stacc-ver="<?php echo $this->getExtensionVersion(); ?>"
+     data-stacc-ver="<?php echo $block->getExtensionVersion(); ?>"
      data-stacc-container-time="<?php echo microtime(true) ?>"></div>
 <!-- Container for recommendations -->
 <?php
-$script = sprintf("<script>
+$script = sprintf(
+    "<script>
             var d = new Date();
             time = d.getTime();
             window.addEventListener('load', function () {
@@ -12,11 +13,12 @@ $script = sprintf("<script>
             })
         </script>",
     $this->getUrl(
-        'recommender/recommendation/get') . "?" . http_build_query(array(
+        'recommender/recommendation/get'
+    ) . "?" . http_build_query([
         'productId' => $this->getProductId() ?: "",
         'blockId' => $this->getElementId(),
         'template' => $this->getRecommendationTemplate()
-    )),
+        ]),
     $this->getElementId()
 );
 echo $script;

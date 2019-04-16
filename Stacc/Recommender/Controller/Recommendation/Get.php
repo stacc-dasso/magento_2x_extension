@@ -17,12 +17,12 @@ class Get extends Action
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * @var LayoutInterface
      */
-    protected $_layout;
+    protected $layout;
 
     /**
      * Get constructor.
@@ -34,10 +34,9 @@ class Get extends Action
     {
         parent::__construct($context);
 
-        $this->_logger = $logger;
-        $this->_layout = $layout;
-        $this->_layout->getUpdate()->addHandle('default');
-
+        $this->logger = $logger;
+        $this->layout = $layout;
+        $this->layout->getUpdate()->addHandle('default');
     }
 
     /**
@@ -53,7 +52,7 @@ class Get extends Action
                 return "";
             }
 
-            $block = $this->_layout
+            $block = $this->layout
                 ->createBlock(
                     'Stacc\Recommender\Block\Recommendation',
                     $blockId
@@ -66,7 +65,15 @@ class Get extends Action
             $this->getResponse()->setBody($block->toHtml())
                 ->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0', true);
         } catch (\Exception $exception) {
-            $this->_logger->critical("Controller/Recommendation/Get.php->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Controller/Recommendation/Get.php->execute() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             $this->getResponse()->setBody("");
             return null;
         }

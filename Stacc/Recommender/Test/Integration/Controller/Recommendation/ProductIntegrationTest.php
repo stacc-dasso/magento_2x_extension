@@ -17,7 +17,8 @@ class ProductIntegrationTest extends AbstractController
         $environment->method("getShopId")->willReturn($this::TEST_SHOP_ID);
         $this->_objectManager->addSharedInstance($environment, Environment::class);
     }
-    public function testRendersSuccessfulSyncResponse() {
+    public function testRendersSuccessfulSyncResponse()
+    {
         $time = time();
         $this->dispatch('recommender/recommendation/product?h='.hash("sha256", $this::TEST_SHOP_ID.$this::TEST_API_KEY)."&t=".$time);
         $string = $this->getResponse()->getBody();

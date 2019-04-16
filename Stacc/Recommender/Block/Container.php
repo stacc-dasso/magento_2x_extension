@@ -17,36 +17,36 @@ class Container extends \Magento\Framework\View\Element\Template
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
 
     /**
      * @var Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * @var Registry
      */
-    protected $_registry;
+    protected $registry;
 
     /**
      * @var
      */
-    private $_product;
+    private $product;
 
     /**
      * Default Template for recommendations
      *
      * @var string
      */
-    private $_defaultRecommendationTemplate = 'Stacc_Recommender::recommendations.phtml';
+    private $defaultRecommendationTemplate = 'Stacc_Recommender::recommendations.phtml';
 
     /**
      * Default value for element id, if id is not set
      *
      * @var string
      */
-    private $_defaultElementId = 'stacc_product_default';
+    private $defaultElementId = 'stacc_product_default';
 
     /**
      * Container constructor.
@@ -61,14 +61,13 @@ class Container extends \Magento\Framework\View\Element\Template
         Logger $logger,
         Registry $registry,
         Context $context,
-        array $data = array()
-    )
-    {
+        array $data = []
+    ) {
         parent::__construct($context, $data);
 
-        $this->_environment = $environment;
-        $this->_logger = $logger;
-        $this->_registry = $registry;
+        $this->environment = $environment;
+        $this->logger = $logger;
+        $this->registry = $registry;
     }
 
     /**
@@ -78,7 +77,7 @@ class Container extends \Magento\Framework\View\Element\Template
      */
     public function getElementId()
     {
-        return $this->getData("elementId") ?: $this->_defaultElementId;
+        return $this->getData("elementId") ?: $this->defaultElementId;
     }
 
     /**
@@ -88,7 +87,7 @@ class Container extends \Magento\Framework\View\Element\Template
      */
     public function getRecommendationTemplate()
     {
-        return $this->getData("recommendationTemplate") ?: $this->_defaultRecommendationTemplate;
+        return $this->getData("recommendationTemplate") ?: $this->defaultRecommendationTemplate;
     }
 
     /**
@@ -98,12 +97,20 @@ class Container extends \Magento\Framework\View\Element\Template
     {
         try {
             $product = $this->getProduct();
-            if (!is_null($product)) {
+            if (!($product===null)) {
                 return $product->getId();
             }
             return "";
         } catch (\Exception $exception) {
-            $this->_logger->critical("Block/Container.php->getExtensionVersion() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Block/Container.php->getExtensionVersion() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return "";
         }
     }
@@ -116,9 +123,17 @@ class Container extends \Magento\Framework\View\Element\Template
     public function getExtensionVersion()
     {
         try {
-            return $this->_environment->getVersion();
+            return $this->environment->getVersion();
         } catch (\Exception $exception) {
-            $this->_logger->critical("Block/Container.php->getExtensionVersion() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Block/Container.php->getExtensionVersion() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
             return null;
         }
     }
@@ -128,14 +143,14 @@ class Container extends \Magento\Framework\View\Element\Template
      */
     private function getProduct()
     {
-        if (is_null($this->_product)) {
-            $this->_product = $this->_registry->registry('product');
+        if (($this->product === null)) {
+            $this->product = $this->registry->registry('product');
 
-            if (is_null($this->_product) || !$this->_product->getId()) {
+            if (($this->product === null) || !$this->product->getId()) {
                 return null;
             }
         }
 
-        return $this->_product;
+        return $this->product;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Stacc\Recommender\Observer;
 
-use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -19,44 +19,48 @@ class Purchase implements ObserverInterface
     /**
      * @var Apiclient
      */
-    protected $_apiClient;
+    protected $apiclient;
 
     /**
      * @var Environment
      */
-    protected $_environment;
+    protected $environment;
 
     /**
      * @var StoreManagerInterface
      */
-    protected $_storeManager;
+    protected $storeManager;
 
     /**
      * @var CheckoutSession
      */
-    protected $_checkoutSession;
+    protected $checkoutSession;
 
     /**
      * @var Logger
      */
-    protected $_logger;
-
+    protected $logger;
 
     /**
      * Purchase constructor.
-     * @param Apiclient $_apiClient
-     * @param Environment $_environment
-     * @param StoreManagerInterface $_storeManager
-     * @param CheckoutSession $_checkoutSession
-     * @param Logger $_logger
+     * @param Apiclient $apiclient
+     * @param Environment $environment
+     * @param StoreManagerInterface $storeManager
+     * @param CheckoutSession $checkoutSession
+     * @param Logger $logger
      */
-    public function __construct(Apiclient $_apiClient, Environment $_environment, StoreManagerInterface $_storeManager, CheckoutSession $_checkoutSession, Logger $_logger)
-    {
-        $this->_apiClient = $_apiClient;
-        $this->_environment = $_environment;
-        $this->_storeManager = $_storeManager;
-        $this->_checkoutSession = $_checkoutSession;
-        $this->_logger = $_logger;
+    public function __construct(
+        Apiclient $apiclient,
+        Environment $environment,
+        StoreManagerInterface $storeManager,
+        CheckoutSession $checkoutSession,
+        Logger $logger
+    ) {
+        $this->apiclient = $apiclient;
+        $this->environment = $environment;
+        $this->storeManager = $storeManager;
+        $this->checkoutSession = $checkoutSession;
+        $this->logger = $logger;
     }
 
     /**
@@ -66,13 +70,21 @@ class Purchase implements ObserverInterface
     {
 
         try {
-            $response = $this->_apiClient->sendPurchaseEvent($this->getPurchases());
+            $response = $this->apiclient->sendPurchaseEvent($this->getPurchases());
 
             if (!$response) {
-                $this->_logger->error("Failed to sync purchase event", array($response));
+                $this->logger->error("Failed to sync purchase event", [$response]);
             }
         } catch (\Exception $exception) {
-            $this->_logger->critical("Observer/Purchase->execute() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            $this->logger
+                ->critical(
+                    "Observer/Purchase->execute() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
         }
     }
 
@@ -83,21 +95,22 @@ class Purchase implements ObserverInterface
     private function getPurchases()
     {
         try {
-            $items = array();
-            $collection = $this->_checkoutSession->getLastRealOrder()->getAllVisibleItems();
-            $store = $this->_storeManager->getStore();
+            $items = [];
+            $collection = $this->checkoutSession->getLastRealOrder()->getAllVisibleItems();
+            $store = $this->storeManager->getStore();
             foreach ($collection as $product) {
+                $formatted_price = $product->getRowTotal() - $product->getDiscountAmount() + $product->getTaxAmount();
                 $prod = [
-                    'item_id' => $product->getProductId(),
-                    'quantity' => $product->getQtyOrdered(),
-                    'price' => $product->getPrice(),
+                    'item_id'    => $product->getProductId(),
+                    'quantity'   => $product->getQtyOrdered(),
+                    'price'      => $product->getPrice(),
                     'properties' => [
-                        'formatted_price' => $product->getRowTotal() - $product->getDiscountAmount() + $product->getTaxAmount(),
-                        'sku' => $product->getSku(),
-                        'tax_amount' => $product->getTaxAmount(),
-                        'currency' => $this->_environment->getCurrencyCode(),
-                        'current_crcy' => $store->getCurrentCurrencyCode(),
-                        'lang' => $store->getCode()
+                        'formatted_price' => $formatted_price,
+                        'sku'             => $product->getSku(),
+                        'tax_amount'      => $product->getTaxAmount(),
+                        'currency'        => $this->environment->getCurrencyCode(),
+                        'current_crcy'    => $store->getCurrentCurrencyCode(),
+                        'lang'            => $store->getCode()
                     ]
                 ];
                 $items[] = $prod;
@@ -105,8 +118,16 @@ class Purchase implements ObserverInterface
 
             return $items;
         } catch (\Exception $exception) {
-            $this->_logger->critical("Observer/Purchase->getPurchases() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-            return array();
+            $this->logger
+                ->critical(
+                    "Observer/Purchase->getPurchases() Exception: ",
+                    [
+                        get_class($exception),
+                        $exception->getMessage(),
+                        $exception->getCode()
+                    ]
+                );
+            return [];
         }
     }
 }
